@@ -11,7 +11,7 @@ use CodonStream;
 use vars qw($usage $filename $replicon);
 
 BEGIN: {
-    Options::use(qw(d q v h min_codons:i fuse:i));
+    Options::use(qw(d q v h min_codons:i fuse:i force no_save_orfs));
     Options::useDefaults(min_codons=>125,
 			 fuse => -1,
 	);
@@ -102,15 +102,32 @@ sub read_strand {
 
 # returns a list[ref] of codom elements ([$start,$stop])
 sub find_orfs {
-    my ($cs,$strand,$gs)=@_;
+    my ($cs,$strand,$gs,$use_saved_orfs)=@_;
     die "no gs" if $strand eq '-' and not defined $gs;
+    my @orfs;			# results go here
+
+    # check for previous results:
+    my $orfs_file=$filename;
+    $orfs_file=~s/\.fna/.orfs/;
+    if ($use_saved_orfs && -e $orfs_file) {
+	if (open(ORFS,$orfs_file)) {
+	    while (<ORFS>) {
+		my @orf=split(/\s+/);
+		push @orfs,\@orf if ($orf[2] eq $strand);
+	    }
+	    close ORFS;
+	    if (@orfs) {
+		return wantarray? @orfs:\@orfs;
+	    }
+	}
+    }
+
     my $frame=1;
     my @frame_start=(0,0,0,0);	# 1-based; first 0 a placeholder
     my $start_codon='ATG';
     my $stop_codons=[qw(TAG TAA TGA)];
     my $n=1;
     my $fuse=$options{fuse};
-    my @orfs;
 
     while (my $codon=$cs->next) {
 	my $frame=(($n-1)%3)+1;	# frames are 1-based
@@ -142,6 +159,17 @@ sub find_orfs {
 	}
 	$n++;
 	last if --$fuse==0;
+    }
+
+    # save orfs for next time:
+    unless ($options{no_save_orfs}) {
+	if (open(ORFS,">>$orfs_file")) {
+	    foreach my $orf (@orfs) {
+		print ORFS join("\t",@$orf),"\n";
+	    }
+	    close ORFS;
+	    warn "$orfs_file written\n";
+	}
     }
 
     return wantarray? @orfs:\@orfs;
