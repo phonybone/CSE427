@@ -1,0 +1,38 @@
+<project name='Hello' default='build'>
+  <property name='package' value='org.phonybone.hello'/>
+  <property environment="env" />
+  <property name='base_dir' value="${env.HOME}/random/coursework/CSE427/hw2/hello" />
+  <property name='package_path' value="org/phonybone/hello" />
+  <property name='src_dir' value="${base_dir}/src"/>
+  <property name='build_dir' value="${base_dir}/bin"/>
+  
+  <property name='jar_name' value="Hello.jar"/>
+  <property name='jar_file' value="${base_dir}/jar/${jar_name}"/>
+
+  <target name="bunny">
+    <echo message="build_dir is ${build_dir}" />
+  </target>
+
+  <target name="clean">
+    <delete dir="${build_dir}"/>
+  </target>
+
+  <target name="build">
+    <mkdir dir="${build_dir}"/>
+    <javac srcdir="${src_dir}" destdir="${build_dir}"/>
+  </target>
+
+  <target name="jar" depends="build">
+    <mkdir dir="${base_dir}/jar"/>
+    <jar destfile="${jar_file}" basedir="${build_dir}">
+      <manifest>
+	<attribute name="Main-Class" value="org.phonybone.hello.Hello"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="run" depends="jar">
+    <java jar="${jar_file}" fork="true"/>
+  </target>
+
+</project>
