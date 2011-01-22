@@ -3,3 +3,5 @@
 *.fna
 *.ptt
 *.p
+*.class
+*.jar
