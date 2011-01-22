@@ -11,15 +11,20 @@ public class TestProtStream {
 	}
 	
 	ProtStream ps=new ProtStream(prot_file);
-	System.out.println(ps.prot_name());
+	//	ps.dump(System.out);
+	//	System.out.println("----");
 	
 
 	String prot;
 	//	int fuse=3;
 	while ((prot=ps.next())!=null) {
+	    System.out.println(ps.prot_name());
 	    System.out.println(nice_prot(prot));
+	    //	    ps.dump(System.out);
+	    //	    System.out.println();
+
 	    //	    if (--fuse==0) break;
-	    System.exit(1);
+	    //	    System.exit(1);
 	}
     }
 
