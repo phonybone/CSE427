@@ -13,7 +13,7 @@
 
   <target name="build">
     <mkdir dir="${build_dir}"/>
-    <javac srcdir="${src_dir}" destdir="${build_dir}"/>
+    <javac srcdir="${src_dir}" destdir="${build_dir}" debug="on" debuglevel="lines,vars,source" />
   </target>
 
   <target name="jar" depends="build">

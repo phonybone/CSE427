@@ -1,21 +1,23 @@
 import java.lang.String;
+import java.util.*;
 
 class LocalAlignment {
     private String query;
     private String subject;
     private int max_score, max_i, max_j;
+    
+    Blosum62 b62=new Blosum62();
+    private int screen_size=70;
 
     public LocalAlignment() {
     }
 
     private int[][] matrix;
-
     public int[][] matrix() { return matrix; } // not going to worry about callers writing into this for the moment.
 
     public int score(String Q, String S) {
 	int Ql=Q.length();
 	int Sl=S.length();
-	Blosum62 b62=new Blosum62();
 
 	int v[][]=new int[Sl+1][Ql+1];
 
@@ -71,7 +73,6 @@ class LocalAlignment {
 	StringBuffer S_align=new StringBuffer();
 	StringBuffer Q_align=new StringBuffer();
 
-	Blosum62 b62=new Blosum62();
 
 	while (v[i][j] > 0) {
 	    
@@ -111,6 +112,65 @@ class LocalAlignment {
 
 	S_align=S_align.reverse();
 	Q_align=Q_align.reverse();
-	return new String(Q_align+"\n"+S_align+"\n");
+
+	// Check lengths:
+	if (S_align.length() != Q_align.length()) {
+	    System.err.println("Error!  Lengths of alignment aren't the same!?!");
+	    System.err.println("S: "+S_align);
+	    System.err.println("Q: "+Q_align);
+	    System.exit(1);
+	}
+
+	// Construct bar string:
+	StringBuffer bs=bar_string(S_align,Q_align);
+
+
+	// Assemble strings into screen-sized format:
+	String final_assembly=assemble(S_align,Q_align,bs);
+	return final_assembly;
     }
+
+    private StringBuffer bar_string(StringBuffer S, StringBuffer Q) {
+	StringBuffer bs=new StringBuffer();
+	int i;
+	for (i=0; i<S.length(); i++) {
+	    char s=S.charAt(i);
+	    char q=Q.charAt(i);
+
+	    char bar;
+	    if (s==q) {
+		bar=s;
+	    } else if (b62.sigma(s,q)>0) {
+		bar='+';
+	    } else {
+		bar=' ';
+	    }
+
+	    //	    char bar=s==q? '|':' ';
+	    bs.append(bar);
+	}
+	return bs;
+    }
+
+    private String assemble(StringBuffer S_align, StringBuffer Q_align, StringBuffer bar) {
+	ArrayList s_list=StringHelpers.chop(S_align,screen_size);
+	Iterator s_itr=s_list.iterator();
+	ArrayList q_list=StringHelpers.chop(Q_align,screen_size);
+	Iterator q_itr=q_list.iterator();
+	ArrayList b_list=StringHelpers.chop(bar,screen_size);
+	Iterator b_itr=b_list.iterator();
+
+	StringBuffer f=new StringBuffer();
+	while (s_itr.hasNext()) {
+	    f.append((String)q_itr.next());
+	    f.append("\n");
+	    f.append((String)b_itr.next());
+	    f.append("\n");
+	    f.append((String)s_itr.next());
+	    f.append("\n\n");
+	}
+
+	return new String(f);
+    }
+
 }

@@ -19,7 +19,7 @@ public class TestProtStream {
 	//	int fuse=3;
 	while ((prot=ps.next())!=null) {
 	    System.out.println(ps.prot_name());
-	    System.out.println(nice_prot(prot));
+	    System.out.println(nice_prot(prot,70));
 	    //	    ps.dump(System.out);
 	    //	    System.out.println();
 
@@ -28,17 +28,17 @@ public class TestProtStream {
 	}
     }
 
-    public static String nice_prot(String prot) {
+    public static String nice_prot(String prot, int line_len) {
 	int l=prot.length();
 	int i=0;
 	StringBuffer nice=new StringBuffer();
 	while (i<l) {
-	    int j = i+70<=l ? i+70 : l;
+	    int j = i+line_len<=l ? i+line_len : l;
 	    nice.append(prot.substring(i,j));
 	    nice.append("\n");
 	    //	    StringBuffer b=new StringBuffer(prot.substring(i,j));
 	    //	    System.out.println(b);
-	    i+=70;
+	    i+=line_len;
 	}
 	return new String(nice).trim();
     }
