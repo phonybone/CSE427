@@ -4,3 +4,5 @@
 *.ptt
 *.p
 NC*
+*.class
+*.jar

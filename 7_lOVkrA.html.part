@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<!-- Server: sfs-consume-6 -->
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <!--[if gte IE 8]>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <![endif]-->
+        <meta name="project" content="genoviz">
+        <title>GenoViz -  Browse Files at SourceForge.net</title>
+        <link rel="stylesheet" href="http://a.fsdn.com/con/css/droppy.css?1294340004" type="text/css" media="screen, projection">
+        <link rel="stylesheet" href="http://a.fsdn.com/con/css/dist.css?1294340004" type="text/css" media="screen, projection">
+        <!--[if lt IE 8]><link rel="stylesheet" href="http://a.fsdn.com/con/css/ie.css?1294340004" type="text/css" media="screen, projection"><![endif]-->
+        <!--[if IE]><script type="text/javascript" src="http://a.fsdn.com/con/js/lib/html5.js?1294340004"></script><![endif]-->
+        
+        <script type="text/javascript">
+            /*jslint onevar: false, nomen: false, evil: true, css: true, plusplus: false, white: false, forin: true */
+            /*global unescape, window, jQuery, $, net, COMSCORE */
+
+            // Setup our namespace
+            if (!window.net) {
+                window.net = {};
+            }
+            if (!window.net.sf) {
+                window.net.sf = {};
+            }
+        </script>
+        
+<!-- DoubleClick Random Number -->
+<script type="text/javascript">
+    var dfp_ord = Math.random() * 10000000000000000;
+    var dfp_tile = 1;
+    var ad_prefix = '';
+    var adspot = '';
+    var ad_wrapper = '';
+    var wrappercode = '';
+    var demandbase = demandbase || '';
+
+    
+    var ad_page = '/project/showfiles.php';
+    
+
+    var adid = '';
+    var sponsored = '';
+    var ad_topics = '';
+    var dfp_dcopt = 'dcopt=ist;';
+
+    
+    var page_id = '';
+    
+
+    
+    var ad_zone = net.sf.ab_test || 'enterprise';
+    if (page_id) {
+        ad_prefix = 'cons_' + page_id + '_' + ad_zone + '_';
+    } else {
+        ad_prefix = 'cons_' + ad_zone + '_';
+    }
+    
+
+    var ad_logged_in = 0;
+    var ad_search = 0;
+    var immersion_adcode = "";
+    var dfp_u = '';
+
+    var google_page_url = 'http://sourceforge.net/projects/genoviz';
+    var sourceforge_project_name = 'GenoViz';
+    var sourceforge_project_description = 'GenoViz provides software applications and re usable components for genomics data visualization and data sharing One included project is IGB the Integrated Genome Browser Documentation is available from http sourceforge net apps trac genoviz ';
+    ad_topics = 'tpc=genoviz;';
+    
+    var google_hints = 'visualization,java,scientific,database,bioinformatics,frontends';
+    dfp_u = '20050122_genoviz_Bio-Informatics';
+    ad_topics += 'tpc=visualization;tpc=java;tpc=scientific;tpc=database;tpc=bioinformatics;tpc=frontends;aud=enduser_advanced;aud=education;aud=healthcareindustry;aud=scienceresearch;';
+    
+
+</script>
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-32013-6']);
+            _gaq.push(['_trackPageview']);
+            (function() {
+                var ga = document.createElement('script');
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                ga.setAttribute('async', 'true');
+                document.documentElement.firstChild.appendChild(ga);
+            }());
+        </script>
+    </head>
+    <body class="pg_files user bp">
+        <div id="busy-spinner"></div>
+        <div id="h"></div>
+        <div class="container">
+            <header id="site-header">
+                <div id="logo">
+                    <a href="/">Find and develop open source software</a>
+                </div>
+                <nav id="metanav">
+                    
+                    <strong>Welcome, Guest!</strong>
+                    <a href="https://sourceforge.net/account/login.php">Log In</a> | <a href="/account/registration/">Create Account</a>
+                    
+                </nav>
+                <nav id="nav">
+                    <ul>
+                        <li class="first"><a title="Find free open source software" href="/directory/">Find Software</a></li>
+                        <li><a title="Learn more about the actively developed projects on SourceForge" href="/develop/">Develop</a></li>
+                        <li><a title="Start your very own project!" href="/register/">Create Project</a></li>
+                        <li><a href="/blog/">Blog</a></li>
+                        <li><a href="http://p.sf.net/sourceforge/getsupport">Site Support</a></li>
+                        <li class="last"><a href="/about">About</a></li>
+                    </ul>
+                </nav>
+                <div class="search">
+                    <form id="searchform" name="searchform" method="get" action="/search/">
+                        <input type="text" placeholder="enter keyword" id="words" name="q" class="text">
+                        <button value="Search" type="submit">Search</button>
+                    </form>
+                </div>
+            </header>
+	    <header id="page-header">
+                
+    <div id="breadcrumbs">
+        <a href="/">SourceForge.net</a> 
+        &gt; <a href="/softwaremap/">Find Software</a> 
+        &gt; <a href="/projects/genoviz/">GenoViz</a>
+        &gt; Files
+    </div>
+    <div id="project_nav_container">
+    
+<div id="project-header">
+    
+
+    
+    
+    <div id="pd-icon" class="editable">
+        <img alt="GenoViz Icon" src="http://a.fsdn.com/con/icons/ge/genoviz@sf.net/igb.gif" height="48" width="48"/>
+    </div>
+    
+
+    
+    <div id="project-header-inner" class="editable">
+        <h2 class="ph-title">GenoViz</h2>
+
+        
+        
+        
+        
+        
+        
+        
+
+        
+        
+        <p id="maintainers" class="ph-developer">
+        by
+        
+        <a href="/users/biotelerock">biotelerock</a>, 
+        
+        <a href="/users/chervitz">chervitz</a>, 
+        
+        <a href="/users/chyekk">chyekk</a>, 
+        
+        <a href="/users/hiralv">hiralv</a>, 
+        
+        <a href="/users/jnicol">jnicol</a>, 
+        
+        <span id="moreMaintainers">
+        
+        <a href="/users/loraine">loraine</a>, 
+        
+        <a href="/users/sgblanch">sgblanch</a>
+        
+        </span>
+        
+        </p>
+        
+    </div><!-- #project-header-inner -->
+</div><!-- #project-header -->
+
+
+
+    
+    <div id="nav-project">
+        <ul class="b-hornav">
+            
+            <li >
+                <a href="/projects/genoviz/">
+                    Summary
+                </a>
+            </li>
+            
+            <li class=" selected">
+                <a href="/projects/genoviz/files/">
+                    <span><span>Files</span></span>
+                </a>
+            </li>
+            
+            <li >
+                <a href="/projects/genoviz/support">
+                    Support
+                </a>
+            </li>
+            
+            <li class="last ">
+                <a href="/projects/genoviz/develop">
+                    Develop
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+
+    </div>
+
+	    </header>
+            <div id="messages">
+            </div>
+            <section id="content">
+    <noscript>
+        <p>The interactive file manager requires Javascript. Please enable it or use <a href="https://sourceforge.net/apps/trac/sourceforge/wiki/Release%20files%20for%20download#SCP">sftp or scp</a>.
+        <br/>You may still <em>browse</em> the files here.</p>
+    </noscript><div class="download-bar">Looking for the latest version? <strong>
+    <a href="http://sourceforge.net/projects/genoviz/files/IGB%206.4.1/igb-webstart.zip/download" title="/IGB 6.4.1/igb-webstart.zip:  released on 2011-01-03 15:13:33 UTC">
+        <span>Download igb-webstart.zip (5.6 MB)</span>
+    </a>
+</strong></div>
+    <div id="files">
+        <div class="files-breadcrumb">
+            <span class="actions"><a href="/api/file/index/project-id/129420/mtime/desc/limit/20/rss" title="Monitor this project's files using RSS"><span class="ui-icon ui-icon-signal-diag">RSS Feed</span></a></span>
+            
+            Home
+            
+            
+        </div>
+
+        <table id="files_list" title="This is a list of the files for this project">
+            <colgroup>
+                <col id="files_name">
+                <col id="files_date">
+                <col id="files_size">
+                <col id="files_status">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th title="The file or folder's name" id="files_name_h" class="first">Name</th>
+                    <th title="The file or folder's last modified date" id="files_date_h" class="opt">Modified</th>
+                    <th title="The file size" id="files_size_h" class="opt">Size</th>
+                    <th title="A snapshot of the file or folder's status" id="files_status_h" class="typesort">Status</th>
+                </tr>
+                
+            </thead>
+            <tbody>
+                
+                <tr title="IGB 6.4.1" class="folder warn">
+                    <th scope="row" headers="files_name_h">
+                        <a href="/projects/genoviz/files/IGB%206.4.1/"
+                           title="Click to enter IGB 6.4.1"
+                           class="name"><span class="ui-icon ui-icon-folder-collapsed"></span>IGB 6.4.1</a>
+                    </th>
+                    <td headers="files_date_h" class="opt"><abbr title="2011-01-03 15:13:32 UTC">2011-01-03</abbr></td>
+                    <td headers="files_size_h" class="opt"></td>
+                    <td headers="files_status_h" class="status"><a href="/projects/genoviz/files/IGB%206.4.1/stats/timeline" class="fs-stats ui-corner-all folder"><img class="fs-sparklines folder" src="http://a.fsdn.com/con/img/gallery/opa75.png" data-src="http://chart.apis.google.com/chart?cht=ls&amp;chs=20x16&amp;chco=0685c6&amp;chm=B,0685c6,0,0,0&amp;chd=t:4,6,9,5,0,1,0&amp;chds=0,9" title="48 downloads" alt="48 downloads" width="20" height="16" /></a></td>
+                </tr>
+                <tr title="DAS2Servers" class="folder warn">
+                    <th scope="row" headers="files_name_h">
+                        <a href="/projects/genoviz/files/DAS2Servers/"
+                           title="Click to enter DAS2Servers"
+                           class="name"><span class="ui-icon ui-icon-folder-collapsed"></span>DAS2Servers</a>
+                    </th>
+                    <td headers="files_date_h" class="opt"><abbr title="2010-11-25 14:31:05 UTC">2010-11-25</abbr></td>
+                    <td headers="files_size_h" class="opt"></td>
+                    <td headers="files_status_h" class="status"><a href="/projects/genoviz/files/DAS2Servers/stats/timeline" class="fs-stats ui-corner-all folder"><img class="fs-sparklines folder" src="http://a.fsdn.com/con/img/gallery/opa75.png" data-src="http://chart.apis.google.com/chart?cht=ls&amp;chs=20x16&amp;chco=0685c6&amp;chm=B,0685c6,0,0,0&amp;chd=t:3,0,0,0,0,0,0&amp;chds=0,9" title="162 downloads" alt="162 downloads" width="20" height="16" /></a></td>
+                </tr>
+                <tr title="IGB-6.4" class="folder warn">
+                    <th scope="row" headers="files_name_h">
+                        <a href="/projects/genoviz/files/IGB-6.4/"
+                           title="Click to enter IGB-6.4"
+                           class="name"><span class="ui-icon ui-icon-folder-collapsed"></span>IGB-6.4</a>
+                    </th>
+                    <td headers="files_date_h" class="opt"><abbr title="2010-11-23 14:44:23 UTC">2010-11-23</abbr></td>
+                    <td headers="files_size_h" class="opt"></td>
+                    <td headers="files_status_h" class="status"><a href="/projects/genoviz/files/IGB-6.4/stats/timeline" class="fs-stats ui-corner-all folder"><img class="fs-sparklines folder" src="http://a.fsdn.com/con/img/gallery/opa75.png" data-src="http://chart.apis.google.com/chart?cht=ls&amp;chs=20x16&amp;chco=0685c6&amp;chm=B,0685c6,0,0,0&amp;chd=t:2,0,1,0,0,0,0&amp;chds=0,9" title="96 downloads" alt="96 downloads" width="20" height="16" /></a></td>
+                </tr>
+                <tr title="IGB-6.3" class="folder warn">
+                    <th scope="row" headers="files_name_h">
+                        <a href="/projects/genoviz/files/IGB-6.3/"
+                           title="Click to enter IGB-6.3"
+                           class="name"><span class="ui-icon ui-icon-folder-collapsed"></span>IGB-6.3</a>
+                    </th>
+                    <td headers="files_date_h" class="opt"><abbr title="2010-10-13 15:20:50 UTC">2010-10-13</abbr></td>
+                    <td headers="files_size_h" class="opt"></td>
+                    <td headers="files_status_h" class="status"><a href="/projects/genoviz/files/IGB-6.3/stats/timeline" class="fs-stats ui-corner-all folder"><img class="fs-sparklines folder" src="http://a.fsdn.com/con/img/gallery/opa75.png" data-src="http://chart.apis.google.com/chart?cht=ls&amp;chs=20x16&amp;chco=0685c6&amp;chm=B,0685c6,0,0,0&amp;chd=t:0,0,4,0,0,0,0&amp;chds=0,9" title="505 downloads" alt="505 downloads" width="20" height="16" /></a></td>
+                </tr>
+                <tr title="IGB-6.2" class="folder warn">
+                    <th scope="row" headers="files_name_h">
+                        <a href="/projects/genoviz/files/IGB-6.2/"
+                           title="Click to enter IGB-6.2"
+                           class="name"><span class="ui-icon ui-icon-folder-collapsed"></span>IGB-6.2</a>
+                    </th>
+                    <td headers="files_date_h" class="opt"><abbr title="2010-05-13 20:49:04 UTC">2010-05-13</abbr></td>
+                    <td headers="files_size_h" class="opt"></td>
+                    <td headers="files_status_h" class="status"><a class="fs-stats ui-corner-all no-recent-downloads folder" href="/projects/genoviz/files/IGB-6.2/stats/timeline" title="262 downloads, none recently."></a></td>
+                </tr>
+                <tr title="IGB-6.1" class="folder warn">
+                    <th scope="row" headers="files_name_h">
+                        <a href="/projects/genoviz/files/IGB-6.1/"
+                           title="Click to enter IGB-6.1"
+                           class="name"><span class="ui-icon ui-icon-folder-collapsed"></span>IGB-6.1</a>
+                    </th>
+                    <td headers="files_date_h" class="opt"><abbr title="2010-01-06 19:59:34 UTC">2010-01-06</abbr></td>
+                    <td headers="files_size_h" class="opt"></td>
+                    <td headers="files_status_h" class="status"><a class="fs-stats ui-corner-all no-recent-downloads folder" href="/projects/genoviz/files/IGB-6.1/stats/timeline" title="528 downloads, none recently."></a></td>
+                </tr>
+                <tr title="IGB-6.0" class="folder warn">
+                    <th scope="row" headers="files_name_h">
+                        <a href="/projects/genoviz/files/IGB-6.0/"
+                           title="Click to enter IGB-6.0"
+                           class="name"><span class="ui-icon ui-icon-folder-collapsed"></span>IGB-6.0</a>
+                    </th>
+                    <td headers="files_date_h" class="opt"><abbr title="2009-09-29 16:10:02 UTC">2009-09-29</abbr></td>
+                    <td headers="files_size_h" class="opt"></td>
+                    <td headers="files_status_h" class="status"><a class="fs-stats ui-corner-all no-recent-downloads folder" href="/projects/genoviz/files/IGB-6.0/stats/timeline" title="695 downloads, none recently."></a></td>
+                </tr>
+                <tr title="IGB-5.5" class="folder warn">
+                    <th scope="row" headers="files_name_h">
+                        <a href="/projects/genoviz/files/IGB-5.5/"
+                           title="Click to enter IGB-5.5"
+                           class="name"><span class="ui-icon ui-icon-folder-collapsed"></span>IGB-5.5</a>
+                    </th>
+                    <td headers="files_date_h" class="opt"><abbr title="2009-06-17 21:31:07 UTC">2009-06-17</abbr></td>
+                    <td headers="files_size_h" class="opt"></td>
+                    <td headers="files_status_h" class="status"><a href="/projects/genoviz/files/IGB-5.5/stats/timeline" class="fs-stats ui-corner-all folder"><img class="fs-sparklines folder" src="http://a.fsdn.com/con/img/gallery/opa75.png" data-src="http://chart.apis.google.com/chart?cht=ls&amp;chs=20x16&amp;chco=0685c6&amp;chm=B,0685c6,0,0,0&amp;chd=t:1,0,0,0,0,0,0&amp;chds=0,9" title="947 downloads" alt="947 downloads" width="20" height="16" /></a></td>
+                </tr>
+                <tr title="Old IGB-4" class="folder warn">
+                    <th scope="row" headers="files_name_h">
+                        <a href="/projects/genoviz/files/Old%20IGB-4/"
+                           title="Click to enter Old IGB-4"
+                           class="name"><span class="ui-icon ui-icon-folder-collapsed"></span>Old IGB-4</a>
+                    </th>
+                    <td headers="files_date_h" class="opt"><abbr title="2007-02-20 22:04:15 UTC">2007-02-20</abbr></td>
+                    <td headers="files_size_h" class="opt"></td>
+                    <td headers="files_status_h" class="status"><a href="/projects/genoviz/files/Old%20IGB-4/stats/timeline" class="fs-stats ui-corner-all folder"><img class="fs-sparklines folder" src="http://a.fsdn.com/con/img/gallery/opa75.png" data-src="http://chart.apis.google.com/chart?cht=ls&amp;chs=20x16&amp;chco=0685c6&amp;chm=B,0685c6,0,0,0&amp;chd=t:0,2,0,0,0,0,0&amp;chds=0,9" title="6,634 downloads" alt="6,634 downloads" width="20" height="16" /></a></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td id="totals"><span class="label">Totals: </span>9 Items</td>
+                    <td class="opt">&nbsp;</td>
+                    <td headers="files_size_h" class="opt"></td>
+                    <td headers="files_status_h">
+                        
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+        <div id="files-drawer" class="fs-widget fs-drawer consumer">
+        </div>
+    </div>
+
+    
+    <div id="sidebar-ads">
+        <div class="ads">
+            <div id="fad84" class="ad imu">
+                
+<script type="text/javascript">
+    adspot = ad_prefix + 'p84_medrec';
+    if (adid !== "") {
+        adspot += ";comp=" + adid;
+    }
+
+    if (immersion_adcode === "") {
+        
+        
+        document.write(unescape('%3Cscript src="http://ad.doubleclick.net/adj/ostg.sourceforge/' + adspot + ';pg=' + ad_page + ';psrch=' + ad_search + wrappercode + ';logged_in=0;' + ad_topics + dfp_dcopt + 'u=' + dfp_u + ';tile=' + dfp_tile + demandbase + ';sz=' + '300x250' + ';ord=' + dfp_ord + '?" type="text/javascript"%3E%3C/script%3E'));
+        
+        dfp_tile = dfp_tile + 1;
+        dfp_dcopt = ''; 
+    }
+</script>
+            </div>
+            <div id="fad85" class="ad imu">
+                
+<script type="text/javascript">
+    adspot = ad_prefix + 'p85_medrec';
+    if (adid !== "") {
+        adspot += ";comp=" + adid;
+    }
+
+    if (immersion_adcode === "") {
+        
+        
+        document.write(unescape('%3Cscript src="http://ad.doubleclick.net/adj/ostg.sourceforge/' + adspot + ';pg=' + ad_page + ';psrch=' + ad_search + wrappercode + ';logged_in=0;' + ad_topics + dfp_dcopt + 'u=' + dfp_u + ';tile=' + dfp_tile + demandbase + ';sz=' + '300x250' + ';ord=' + dfp_ord + '?" type="text/javascript"%3E%3C/script%3E'));
+        
+        dfp_tile = dfp_tile + 1;
+        dfp_dcopt = ''; 
+    }
+</script>
+            </div>
+        </div>
+    </div>
+    
+
+            </section>
+            <footer id="site-footer">
+                <nav id="footer-about" class="first ft">
+                    <h4>About SourceForge</h4>
+                    <ul class="first">
+                        <li><a href="/about">About SourceForge</a></li>
+                        <li><a href="/support">Contact Us</a></li>
+                        <li><a href="http://geek.net/careers/">Jobs @ Geeknet</a></li>
+                        <li><a href="http://geek.net/advertising/">Advertising</a></li>
+                    </ul>
+                </nav>
+                <nav id="footer-find" class="ft">
+                    <h4>Find Software</h4>
+                    <ul>
+                        <li><a href="/search/">Search Software</a></li>
+                        <li><a href="/softwaremap/">Browse by Category</a></li>
+                        <li><a href="/top/topalltime.php?type=downloads">Most Popular Overall</a></li>
+                        <li><a href="/top/mostactive.php">Most Active Overall</a></li>
+                    </ul>
+                </nav>
+                <nav id="footer-develop" class="ft">
+                    <h4>Develop Software</h4>
+                    <ul>
+                        <li><a href="/register/">Create Project</a></li>
+                        <li><a href="/people/">Project Help Wanted</a></li>
+                        <li><a href="/new/new_projects.php">New Projects</a></li>
+                    </ul>
+                </nav>
+                <nav id="footer-community" class="ft">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="/blog/">The Blog</a></li>
+                        <li><a rel="nofollow" href="http://twitter.com/sourceforge">@sourceforge on Twitter</a></li>
+                    </ul>
+                </nav>
+                <nav id="footer-help" class="last ft">
+                    <h4>Help</h4>
+                    <ul>
+                        <li><a href="http://sourceforge.net/apps/trac/sourceforge/wiki/WikiStart">Site Documentation</a></li>
+                        <li><a href="http://sourceforge.net/apps/trac/sourceforge/wiki/Support">Support Requests</a></li>
+                        <li><a href="http://sourceforge.net/apps/wordpress/sourceforge/">Site Outages</a></li>
+                    </ul>
+                </nav>
+                <div id="copyright">
+                    &copy; 2010 <a href="http://geek.net" title="Network which provides and promotes Open Source software downloads, development, discussion and news.">Geeknet, Inc.</a> <a href="http://p.sf.net/sourceforge/terms">Terms of Use</a> - <a href="http://p.sf.net/sourceforge/privacy">Privacy Policy</a>
+                </div>
+            </footer>
+        </div>
+        <div id="bigblue"><div></div></div>
+        <script src="http://a.fsdn.com/con/js/min.js?1294340004" type="text/javascript"></script>
+        
+<script type="text/javascript" src="http://a.fsdn.com/con/js/files.js?1294340004"></script>
+
+
+<script type="text/html" id="default_platforms_tmpl">
+    <%
+    var defaults = [
+            { value: 'windows', label: 'Windows' },
+            { value: 'mac', label: 'Mac OS X' },
+            { value: 'linux', label: 'Linux' },
+            { value: 'bsd', label: 'BSD' },
+            { value: 'solaris', label: 'Solaris' },
+            { value: 'others', label: 'Others' }
+        ];
+    %><% if (this.length) { %><div class="drawer-label">
+        <span>Default Download For:</span>
+    </div>
+    <div class="drawer-value">
+        <ul>
+            <% for (i in defaults) { %>
+            <% var v = defaults[i].value, l = defaults[i].label; %><% if (this.indexOf(v) >= 0) { %><li><span title="<%= l %>" class="icon <%= v %>"><%= l %></span><% } %><% } %>
+        </ul>
+    </div><% } %></script>
+
+<script type="text/html" id="file_drawer_tmpl">
+<form class="bp" action="/projects/genoviz/files/<%= this.full_path %>" method="put" id="file_properties_content">
+    <table id="drawer_row">
+        <tbody>
+            <tr title="<%= this.name %>">
+                <td class="files_name"><a href="<% if (this.type === 'f') { %><%= this.download_url %><% } else { %><%= this.url %><% } %>" class="name"><%= this.name %></a>
+                </td>
+                <td class="files_date"></td>
+                <td class="files_size"></td>
+                <td class="files_status status"></td>
+            </tr></tbody>
+    </table>
+    <div id="file-details">
+        <% if (this.type === 'f') { %>
+        <div id="file-info">
+            <div>
+                <div class="label">
+                    <span>SHA1:</span>
+                </div>
+                <div class="value">
+                    <pre class="selectable"><%= this.sha1 %></pre>
+                </div>
+
+                <div class="label">
+                    <span>MD5:</span>
+                </div>
+                <div class="value">
+                    <pre class="selectable"><%= this.md5 %></pre>
+                </div><% if (this.legacy_release_notes) { %>
+                <div class="value no-label">
+                    <span><a href="<%= this.legacy_release_notes %>">Release Notes</a></span>
+                </div>
+                <% } %>
+            </div>
+        </div>
+
+        <div id="download-info">
+            <div class="label">
+                <span>Downloads:</span>
+            </div>
+            <div class="value">
+                <span><%= (this.downloads === null ? 'Not counted' : this.downloads) %></span>
+            </div><div class="default">
+                <span style="display: block; position: static;" class="busy-spinner ui-corner-all"></span>
+            </div>
+        </div>
+        <% } %></div>
+</form>
+</script>
+
+<script type="text/javascript">
+    jQuery(function ($) {
+        $('#files').files();
+        var tsConfig = {
+            widgets: ['zebra'],
+            sortList: [[3, 0], [1, 1]],
+            sortForce: [[3, 0]],
+            headers: {
+                0: { sorter: 'filename' },
+                1: { sorter: 'abbrdate' },
+                2: { sorter: 'filesize' },
+                3: { sorter: 'type'}
+            },
+            textExtraction: function (node) {
+                return node.innerHTML;
+            }
+        };
+
+        if ($('#files_list tbody tr').length) {
+            $('#files_list').tablesorter(tsConfig);
+            $('#files_list tr th#parent_folder').unbind();
+            $('#files_list tr th.header').not('.typesort').not('#parent_folder').addClass('usersortable').append('<span class="ui-icon fs-toggle"><\/span>');
+        }
+        /*jslint white: false*/
+        net.sf.files = {
+            "IGB 6.4.1": {"sha1": "", "name": "IGB 6.4.1", "mirrors": 0, "url": "/projects/genoviz/files/IGB%206.4.1/", "downloads": 48, "exclude_reports": false, "download_url": "http://sourceforge.net/projects/genoviz/files/IGB%206.4.1/download", "default": "", "downloadable": false, "path": "", "download_label": "", "md5": "", "type": "d", "full_path": "IGB 6.4.1", "legacy_release_notes": null},
+            "DAS2Servers": {"sha1": "", "name": "DAS2Servers", "mirrors": 0, "url": "/projects/genoviz/files/DAS2Servers/", "downloads": 162, "exclude_reports": false, "download_url": "http://sourceforge.net/projects/genoviz/files/DAS2Servers/download", "default": "", "downloadable": false, "path": "", "download_label": "", "md5": "", "type": "d", "full_path": "DAS2Servers", "legacy_release_notes": null},
+            "IGB-6.4": {"sha1": "", "name": "IGB-6.4", "mirrors": 0, "url": "/projects/genoviz/files/IGB-6.4/", "downloads": 96, "exclude_reports": false, "download_url": "http://sourceforge.net/projects/genoviz/files/IGB-6.4/download", "default": "", "downloadable": false, "path": "", "download_label": "IGB-6.4", "md5": "", "type": "d", "full_path": "IGB-6.4", "legacy_release_notes": null},
+            "IGB-6.3": {"sha1": "", "name": "IGB-6.3", "mirrors": 0, "url": "/projects/genoviz/files/IGB-6.3/", "downloads": 505, "exclude_reports": false, "download_url": "http://sourceforge.net/projects/genoviz/files/IGB-6.3/download", "default": "", "downloadable": false, "path": "", "download_label": "IGB-6.3", "md5": "", "type": "d", "full_path": "IGB-6.3", "legacy_release_notes": null},
+            "IGB-6.2": {"sha1": "", "name": "IGB-6.2", "mirrors": 0, "url": "/projects/genoviz/files/IGB-6.2/", "downloads": 262, "exclude_reports": false, "download_url": "http://sourceforge.net/projects/genoviz/files/IGB-6.2/download", "default": "", "downloadable": false, "path": "", "download_label": "IGB 6.2", "md5": "", "type": "d", "full_path": "IGB-6.2", "legacy_release_notes": null},
+            "IGB-6.1": {"sha1": "", "name": "IGB-6.1", "mirrors": 0, "url": "/projects/genoviz/files/IGB-6.1/", "downloads": 528, "exclude_reports": false, "download_url": "http://sourceforge.net/projects/genoviz/files/IGB-6.1/download", "default": "", "downloadable": false, "path": "", "download_label": "IGB 6.1", "md5": "", "type": "d", "full_path": "IGB-6.1", "legacy_release_notes": null},
+            "IGB-6.0": {"sha1": "", "name": "IGB-6.0", "mirrors": 0, "url": "/projects/genoviz/files/IGB-6.0/", "downloads": 695, "exclude_reports": false, "download_url": "http://sourceforge.net/projects/genoviz/files/IGB-6.0/download", "default": "", "downloadable": false, "path": "", "download_label": "", "md5": "", "type": "d", "full_path": "IGB-6.0", "legacy_release_notes": null},
+            "IGB-5.5": {"sha1": "", "name": "IGB-5.5", "mirrors": 0, "url": "/projects/genoviz/files/IGB-5.5/", "downloads": 947, "exclude_reports": false, "download_url": "http://sourceforge.net/projects/genoviz/files/IGB-5.5/download", "default": "", "downloadable": false, "path": "", "download_label": "", "md5": "", "type": "d", "full_path": "IGB-5.5", "legacy_release_notes": null},
+            "Old IGB-4": {"sha1": "", "name": "Old IGB-4", "mirrors": 0, "url": "/projects/genoviz/files/Old%20IGB-4/", "downloads": 6634, "exclude_reports": false, "download_url": "http://sourceforge.net/projects/genoviz/files/Old%20IGB-4/download", "default": "", "downloadable": false, "path": "", "download_label": "", "md5": "", "type": "d", "full_path": "Old IGB-4", "legacy_release_notes": null}
+            };
+        $('.fs-sparklines').each(function(){
+            $(this).attr('src', $(this).attr('data-src'));
+        });
+    });
+</script>
+
+    </body>
+</html>
