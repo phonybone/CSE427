@@ -24,7 +24,7 @@ BEGIN: {
 
 sub main {
     my $results_filename=shift or die "no results (.txt) file\n";
-    my $fna_filename='../../'.$results_filename;
+    my $fna_filename=$results_filename;
     $fna_filename=~s/\.txt/.fna/;
 
     # load NCBI predictions:

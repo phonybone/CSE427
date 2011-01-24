@@ -37,7 +37,7 @@ sub open {
     my $filename=shift || $self->filename or confess "no filename";
 
     $self->fh(FileHandle->new());
-    $self->fh->open($filename) or die "Can't open $filename: $!\n";
+    $self->fh->open($filename) or confess "Can't open $filename: $!";
     $self->_next_line;
     $self->_next_line unless $self->buffer=~/^[acgt]+$/i;
 
