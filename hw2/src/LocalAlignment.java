@@ -74,6 +74,8 @@ class LocalAlignment {
 	StringBuffer Q_align=new StringBuffer();
 
 
+	int s_end=i;
+	int q_end=j;
 	while (v[i][j] > 0) {
 	    
 	    // Determine next i,j
@@ -109,6 +111,8 @@ class LocalAlignment {
 	    i=next_i;
 	    j=next_j;
 	}
+	int s_start=i;
+	int q_start=i;
 
 	S_align=S_align.reverse();
 	Q_align=Q_align.reverse();
@@ -126,7 +130,7 @@ class LocalAlignment {
 
 
 	// Assemble strings into screen-sized format:
-	String final_assembly=assemble(S_align,Q_align,bs);
+	String final_assembly=assemble(S_align,Q_align,bs,s_start,s_end,q_start,q_end);
 	return final_assembly;
     }
 
@@ -152,7 +156,9 @@ class LocalAlignment {
 	return bs;
     }
 
-    private String assemble(StringBuffer S_align, StringBuffer Q_align, StringBuffer bar) {
+    private String assemble(StringBuffer S_align, StringBuffer Q_align, StringBuffer bar,
+			    int s_start, int s_end, int q_start, int q_end) {
+	// Only need s_end and q_end for verification
 	ArrayList s_list=StringHelpers.chop(S_align,screen_size);
 	Iterator s_itr=s_list.iterator();
 	ArrayList q_list=StringHelpers.chop(Q_align,screen_size);
@@ -161,13 +167,21 @@ class LocalAlignment {
 	Iterator b_itr=b_list.iterator();
 
 	StringBuffer f=new StringBuffer();
+
+	
 	while (s_itr.hasNext()) {
-	    f.append((String)q_itr.next());
-	    f.append("\n");
-	    f.append((String)b_itr.next());
-	    f.append("\n");
-	    f.append((String)s_itr.next());
-	    f.append("\n\n");
+	    String q=(String)q_itr.next();
+	    int q_inc=(screen_size-StringHelpers.occurences_of(q,'-'));
+	    f.append(String.format("Q  %4d  %s  %4d\n",q_start, q, q_start+q_inc-1));
+	    q_start+=q_inc;
+	    
+	    f.append("         "+(String)b_itr.next()+"        \n");
+	    
+	    String s=(String)s_itr.next();
+	    int s_inc=(screen_size-StringHelpers.occurences_of(s,'-'));
+	    f.append(String.format("S  %4d  %s  %4d\n\n",s_start, s, s_start+s_inc-1));
+	    s_start+=s_inc;
+
 	}
 
 	return new String(f);

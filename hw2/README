@@ -1,0 +1,22 @@
+To compile and run the programs provided, you'll need java and the
+java compilation/building tool, ant. 
+
+Un-tar the HW2.tgz file (it will create it's own directory:
+> tar xfz HW2.tgz
+
+Compile the java code:
+> ant build
+
+Use a shell script to run the java program three times, once my
+organism and twice on the community organism:
+
+> sh run.sh
+
+(Redirect and/or time the output as desired.  On my laptop this takes
+about 1 minute to run).
+
+
+
+
+
+
