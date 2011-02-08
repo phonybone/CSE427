@@ -3,6 +3,8 @@
   <property name='base_dir' value="${env.HOME}/random/coursework/CSE427/hw3" />
   <property name='src_dir' value="${base_dir}/src"/>
   <property name='build_dir' value="${base_dir}/bin"/>
+
+
   <property name='args' value=''/>
   <property name='main_class' value='HW3' />
   <property name='jar_name' value="${main_class}.jar"/>
