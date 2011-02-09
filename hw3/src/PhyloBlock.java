@@ -22,7 +22,7 @@ class PhyloBlock {
     }
 
     public void setQ(ArrayList<Double> Dq) {
-	this.length=q.length;
+	this.length=Dq.size();
 	this.stop=start+length-1; // start and stop are the same when length==1
 
 	q=new double[Dq.size()];
@@ -66,7 +66,7 @@ class PhyloBlock {
 	}
 	return new String(s);
     }
-    public String toString() {	return toString(30);    }
+    public String toString() {	return toString(20);    }
 
     public void rFromQ() {
 	this.r=new double[length];
