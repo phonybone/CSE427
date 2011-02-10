@@ -6,6 +6,7 @@ class PhyloParser {
     public BufferedReader reader;
     public PhyloBlock currentBlock;
     public double c;
+    public double max_score;
     public ArrayList<Double> q;
 
     PhyloParser(String phylofile, double c) {
@@ -21,6 +22,7 @@ class PhyloParser {
 	}
 	q=new ArrayList<Double>();
 	this.c=c;
+	this.max_score=0;
     }
 
     // Parse lines that look like this:
@@ -38,11 +40,8 @@ class PhyloParser {
 	    String[] m2=matches[i].split("=");
 	    if (m2[0].equals("chrom")) chrom=m2[0];
 	    if (m2[0].equals("start")) {
-		try {
-		    start=Integer.parseInt(m2[1]);
-		} catch (NumberFormatException nfe) {
-		    new Die(nfe, "trying to convert "+m2[1]+" to integer");
-		}
+		try { start=Integer.parseInt(m2[1]); }
+		catch (NumberFormatException nfe) { new Die(nfe, "trying to convert "+m2[1]+" to integer"); }
 	    }
 	}
 	
@@ -61,6 +60,8 @@ class PhyloParser {
 		   // Create and return current block:
 		   block=currentBlock;
 		   block.setQ(q);
+		   block.max_score=max_score;
+		   max_score=0;
 		   assert block.length==q.size();
 		   //		   System.err.println(String.format("new block: length=%d",q.size()));
 		   currentBlock=parseFixedLine(line);
@@ -70,6 +71,7 @@ class PhyloParser {
 		   Double v=Double.valueOf(line.trim());
 		   if (v<0) v=0.0;
 		   q.add(new Double(v-c));
+		   if (v>max_score) max_score=v;
 	       } catch (NumberFormatException nfe) {
 		   new Die(nfe);
 	       }

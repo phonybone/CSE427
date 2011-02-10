@@ -9,6 +9,8 @@ class PhyloBlock {
     public double[] r;
     public double[] X;
     public double[] Y;
+    public double max_score;
+
 
     public PhyloBlock(String chrom, int start) {
 	this.chrom=chrom;
@@ -34,32 +36,38 @@ class PhyloBlock {
 	YFromR();
     }
 
+
+    public String headerString() {
+	return String.format("%s: %d-%d (l=%d) %5.3f\n", chrom, start, stop, length, max_score);
+    }
+
+
     public String toString(int width) {
 	StringBuffer s=new StringBuffer();
-	s.append(String.format("%s: %d-%d (%d)\n", chrom, start, stop, length));
+	s.append(this.headerString());
 
 	int i=0;
 
 	while (i < q.length) {
 	    if (q!=null) {
 		s.append("q: ");
-		for (int j=i; j<i+width && j<length; j++) { s.append(String.format(" %6.3f",q[i])); }
+		for (int j=i; j<i+width && j<length; j++) { s.append(String.format(" %6.3f",q[j])); }
 		s.append("\n");
 	    }
 	    if (r!=null) {
 		s.append("r: ");
-		for (int j=i; j<i+width && j<length; j++) { s.append(String.format(" %6.3f",r[i])); }
+		for (int j=i; j<i+width && j<length; j++) { s.append(String.format(" %6.3f",r[j])); }
 		s.append("\n");
 	    }
 
 	    if (X!=null) {
 		s.append("x: ");
-		for (int j=i; j<i+width && j<length; j++) { s.append(String.format(" %6.3f",X[i])); }
+		for (int j=i; j<i+width && j<length; j++) { s.append(String.format(" %6.3f",X[j])); }
 		s.append("\n");
 	    }
 	    if (Y!=null) {
 		s.append("y: ");
-		for (int j=i; j<i+width && j<length; j++) { s.append(String.format(" %6.3f",Y[i])); }
+		for (int j=i; j<i+width && j<length; j++) { s.append(String.format(" %6.3f",Y[j])); }
 		s.append("\n\n");
 	    }
 	    i+=width;
