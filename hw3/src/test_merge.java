@@ -7,9 +7,31 @@ class test_merge {
 	assert X.length==Y.length;
 	
 	ArrayList<Interval> m=mergeXY(X,Y);
+	System.out.println("All intervals");
 	for (int i=0; i<m.size(); i++) {
 	    System.out.println(m.get(i).toString());
 	}
+
+	// assume m is sorted; combine overlapping intervals
+	Interval[] ma=m.toArray(new Interval[m.size()]);
+	Interval current=ma[0];
+	ArrayList<Interval> merged=new ArrayList<Interval>();
+	for (int i=1; i<ma.length; i++) {
+	    if (ma[i].overlaps(current)) {
+		current=current.join(ma[i]);
+	    } else {
+		merged.add(current);
+		current=ma[i];
+	    }
+	}
+	if (!current.ne(ma[ma.length-1])) {
+	    merged.add(current);
+	}
+	System.out.println("Merged");
+	for (int i=0; i<merged.size(); i++) {
+	    System.out.println(merged.get(i).toString());
+	}
+
     }
 
     public static ArrayList<Interval> mergeXY(double[] X, double [] Y) {

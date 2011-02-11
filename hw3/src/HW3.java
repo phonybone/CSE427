@@ -18,7 +18,7 @@ class HW3 {
 	    b.rFromQ();
 	    b.XFromR();
 	    b.YFromR();
-	    b.
+
 	}
 	System.err.println(String.format("%d skipped blocks\n",n_skipped));
     }

@@ -33,6 +33,11 @@ class Interval
     // Question/fixme: how to implement the Comparator interface?
 
 
+    public static boolean eq(Interval i1, Interval i2) { return i1.start==i2.start && i1.stop==i2.stop; }
+    public        boolean eq(Interval other) { return eq(this,other); }
+    public static boolean ne(Interval i1, Interval i2) { return i1.start!=i2.start || i1.stop!=i2.stop; }
+    public        boolean ne(Interval other) { return ne(this,other); }
+
     public static boolean gt(Interval i1, Interval i2) { return i1.start>i2.stop; }
     public static boolean lt(Interval i1, Interval i2) { return i1.stop<i2.start; }
     public        boolean gt(Interval other) { return gt(this,other); }
@@ -63,8 +68,26 @@ class Interval
     // Do so even if they don't overlap
     public static Interval join(Interval i1, Interval i2) {
 	int start=i1.start<i2.start? i1.start : i2.start;
-	int stop=i1.stop<i2.stop? i1.stop : i2.stop;
+	int stop=i1.stop>i2.stop? i1.stop : i2.stop;
 	return new Interval(start,stop);
     }
     public Interval join(Interval other) { return join(this,other); }
+
+
+    public static Interval[] merge_overlaps(Interval[] sorted) {
+	Interval current=sorted[0];
+	ArrayList<Interval> merged=new ArrayList<Interval>();
+	for (int i=1; i<sorted.length; i++) {
+	    if (sorted[i].overlaps(current)) {
+		current=current.join(sorted[i]);
+	    } else {
+		merged.add(current);
+		current=sorted[i];
+	    }
+	}
+	if (!current.ne(sorted[sorted.length-1])) {
+	    merged.add(current);
+	}
+	return merged.toArray(new Interval[merged.size()]);
+    }
 }
