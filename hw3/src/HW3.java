@@ -12,7 +12,7 @@ class HW3 {
 	    PhyloParser pp=new PhyloParser(phylofile,c);
 	    PhyloBlock b;
 	    int n_skipped=0;
-	    int fuse=-1;
+	    int fuse=-3;
 	    while ((b=pp.nextBlock())!=null) {
 		if (b.max_score < c) {
 		    n_skipped++;
