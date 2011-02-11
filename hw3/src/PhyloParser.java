@@ -25,7 +25,7 @@ class PhyloParser {
 
     private void parseFixedLine(String line) {
 	if (!line.startsWith("fixed")) 
-	    throw new IOExceptions(line+": doesn't start with 'fixed'");
+	    throw new IOException(line+": doesn't start with 'fixed'");
 	String[] matches=line.matches("\\s+");
 	for (int i=0; i<matches.length; i++) {
 	    String[] m2=matches[i].split("=");

@@ -1,5 +1,7 @@
 
-class Interval implements Serializable {
+class Interval 
+//implements Serializable 
+{
     public int start;
     public int stop;
 
