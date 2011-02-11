@@ -9,8 +9,8 @@ class PhyloBlock {
     public double[] r;
     public double[] X;
     public double[] Y;
-    public int n_c;		// number of phyloP scores that are higher than c
-    public int min_interval;
+    public double max_score;		// number of phyloP scores that are higher than c
+    public int min_interval = 100;
     
 
     public PhyloBlock(String chrom, int start) {
@@ -18,7 +18,7 @@ class PhyloBlock {
 	this.start=start;
 	stop=0;
 	length=0;
-	n_c=0;
+	max_score=-10000;	// whatever; something large and negative
 	q=null;
 	r=null;
 	X=null;
@@ -41,7 +41,7 @@ class PhyloBlock {
 
 
     public String headerString() {
-	return String.format("%s: %d-%d (l=%d) %d\n", chrom, start, stop, length, n_c);
+	return String.format("%s: %d-%d (l=%d) max_score=%g", chrom, start, stop, length, max_score);
     }
 
 
@@ -103,7 +103,7 @@ class PhyloBlock {
 	}
     } 
 
-     public static ArrayList<Interval> mergeXY(double[] X, double [] Y) {
+    public ArrayList<Interval> mergeXY() {
 	int xi=0;
 	int yj=0;
 	boolean in_y=Y[0]<=X[0];
@@ -119,7 +119,7 @@ class PhyloBlock {
 		in_y=true;
 	    } else {
 		xi++;
-		if (in_y) {
+		if (in_y && (yj-xi > min_interval)) {
 		    Interval i=new Interval(xi,yj-1);
 		    iList.add(i);
 		    // System.out.println("added "+i.toString());

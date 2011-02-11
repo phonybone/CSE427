@@ -6,7 +6,7 @@ class PhyloParser {
     public BufferedReader reader;
     public PhyloBlock currentBlock;
     public double c;
-    public int n_c;
+    public double max_score;
     public ArrayList<Double> q;
 
     PhyloParser(String phylofile, double c) {
@@ -22,7 +22,7 @@ class PhyloParser {
 	}
 	q=new ArrayList<Double>();
 	this.c=c;
-	this.n_c=0;
+	this.max_score=-100000;
     }
 
     // Parse lines that look like this:
@@ -38,7 +38,7 @@ class PhyloParser {
 	String[] matches=line.split("\\s+");
 	for (int i=0; i<matches.length; i++) {
 	    String[] m2=matches[i].split("=");
-	    if (m2[0].equals("chrom")) chrom=m2[0];
+	    if (m2[0].equals("chrom")) chrom=m2[1];
 	    if (m2[0].equals("start")) {
 		try { start=Integer.parseInt(m2[1]); }
 		catch (NumberFormatException nfe) { new Die(nfe, "trying to convert "+m2[1]+" to integer"); }
@@ -60,8 +60,8 @@ class PhyloParser {
 		   // Create and return current block:
 		   block=currentBlock;
 		   block.setQ(q);
-		   block.n_c=n_c;
-		   this.n_c=0;
+		   block.max_score=max_score;
+		   this.max_score=-10000;
 		   //		   System.err.println("nextBlock: "+block.headerString());
 		   assert block.length==q.size();
 		   //		   System.err.println(String.format("new block: length=%d",q.size()));
@@ -72,7 +72,7 @@ class PhyloParser {
 		   Double v=Double.valueOf(line.trim());
 		   if (v<0) v=0.0;
 		   q.add(new Double(v-c));
-		   if (v>c) n_c++;
+		   if (v>max_score) max_score=v;
 	       } catch (NumberFormatException nfe) { new Die(nfe); }
 	   }
        } catch (IOException ioe) { new Die(ioe); }

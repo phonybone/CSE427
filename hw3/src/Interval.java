@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.*;
 
 class Interval 
 //implements Serializable 
@@ -10,6 +11,8 @@ class Interval
 	this.start=start;
 	this.stop=stop;
     }
+
+    public int length() { return stop-start+1; }
 
     public String asString() { return String.format("%d-%d",this.start,this.stop); }
     public String toString() { return asString(); }
