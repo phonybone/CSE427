@@ -12,7 +12,7 @@ use vars qw($usage);
 BEGIN: {
     Options::use(qw(d q v h min_codons:i fuse:i no_header no_save_orfs save_lists replicon|r:s));
     Options::useDefaults(min_codons=>125,
-			 replicon=>[],
+			 replicon=>[qw(NC_011660 NC_007618 NC_007624)],
 			 fuse => -1,
 	);
     Options::get();
