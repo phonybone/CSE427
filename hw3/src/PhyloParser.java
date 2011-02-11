@@ -60,12 +60,14 @@ class PhyloParser {
 		   // Create and return current block:
 		   block=currentBlock;
 		   block.setQ(q);
+		   q.clear();
 		   block.max_score=max_score;
 		   this.max_score=-10000;
 		   //		   System.err.println("nextBlock: "+block.headerString());
 		   assert block.length==q.size();
 		   //		   System.err.println(String.format("new block: length=%d",q.size()));
 		   currentBlock=parseFixedLine(line);
+		   // System.out.println(String.format("new current block: %s",currentBlock.headerString()));
 		   break;
 	       }
 	       try {
@@ -76,6 +78,7 @@ class PhyloParser {
 	       } catch (NumberFormatException nfe) { new Die(nfe); }
 	   }
        } catch (IOException ioe) { new Die(ioe); }
+       
        return block; 		// is null if done
    }
 }

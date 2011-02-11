@@ -12,12 +12,12 @@ class HW3 {
 	    PhyloParser pp=new PhyloParser(phylofile,c);
 	    PhyloBlock b;
 	    int n_skipped=0;
+	    int fuse=-1;
 	    while ((b=pp.nextBlock())!=null) {
 		if (b.max_score < c) {
 		    n_skipped++;
 		    continue;
 		}
-		System.out.println(b.headerString());
 
 		b.rFromQ();
 		b.XFromR();
@@ -25,14 +25,13 @@ class HW3 {
 
 		ArrayList<Interval> hcc_al=b.mergeXY(); // hcc for "highly conserved candidates"
 		Interval[] hcc=hcc_al.toArray(new Interval[hcc_al.size()]);
+		if (hcc.length==0) continue;
 		System.out.println(String.format("%s: Interval list (unmerged) (len=%d)",b.headerString(), hcc.length));
-		for (i=0; i<hcc.length; i++) {
-		    System.out.println(String.format("%s (%d)",hcc[i].toString(),hcc.length));
+		for (int j=0; j<hcc.length; j++) {
+		    System.out.println(String.format("%s (%d)",hcc[j].toString(),hcc[j].length()));
 		}
-		//Runtime r=Runtime.getRuntime();
-		//r.gc();
+		if (fuse-- == 0) break;
 	    }
-
 	    System.out.println(String.format("chr%s: %d skipped blocks\n", human_chrs[i], n_skipped));
 	}
     }

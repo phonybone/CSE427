@@ -28,15 +28,12 @@ class PhyloBlock {
     public void setQ(ArrayList<Double> Dq) {
 	this.length=Dq.size();
 	this.stop=start+length-1; // start and stop are the same when length==1
-
+	//System.out.println(String.format("seqQ: start=%d, length=%d, stop=%d",this.start, this.length, this.stop));
 	q=new double[Dq.size()];
 	for (int i=0; i<q.length; i++) { q[i]=Dq.get(i).doubleValue();}
 	// there has GOT to be a better way of doing this
 	// Could use ArrayList.toArray(Double[]), but would still have to 
 	// convert Double to double for each element.
-	//rFromQ();
-	//XFromR();
-	//YFromR();
     }
 
 
@@ -129,7 +126,7 @@ class PhyloBlock {
 	}
 	if (xi<X.length) {
 	    Interval i=new Interval(xi+1,yj-1); // I *think* these indices are right
-	    iList.add(i);
+	    //iList.add(i);
 	    // System.out.println("added final "+i.toString());
 	}
 
