@@ -23,6 +23,5 @@ class al2d {
 	for (int i=0; i<da2.length; i++) {
 	    System.out.println(String.format("da2[%d]=%g",i,da2[i]));
 	}
-
     }
 }

@@ -73,13 +73,9 @@ class PhyloParser {
 		   if (v<0) v=0.0;
 		   q.add(new Double(v-c));
 		   if (v>c) n_c++;
-	       } catch (NumberFormatException nfe) {
-		   new Die(nfe);
-	       }
+	       } catch (NumberFormatException nfe) { new Die(nfe); }
 	   }
-       } catch (IOException ioe) {
-	   new Die(ioe);
-       }
+       } catch (IOException ioe) { new Die(ioe); }
        return block; 		// is null if done
    }
 }
