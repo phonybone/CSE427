@@ -9,14 +9,16 @@ class PhyloBlock {
     public double[] r;
     public double[] X;
     public double[] Y;
-    public double max_score;
-
+    public int n_c;		// number of phyloP scores that are higher than c
+    public int min_interval;
+    
 
     public PhyloBlock(String chrom, int start) {
 	this.chrom=chrom;
 	this.start=start;
 	stop=0;
 	length=0;
+	n_c=0;
 	q=null;
 	r=null;
 	X=null;
@@ -30,15 +32,16 @@ class PhyloBlock {
 	q=new double[Dq.size()];
 	for (int i=0; i<q.length; i++) { q[i]=Dq.get(i).doubleValue();}
 	// there has GOT to be a better way of doing this
-
-	rFromQ();
-	XFromR();
-	YFromR();
+	// Could use ArrayList.toArray(Double[]), but would still have to 
+	// convert Double to double for each element.
+	//rFromQ();
+	//XFromR();
+	//YFromR();
     }
 
 
     public String headerString() {
-	return String.format("%s: %d-%d (l=%d) %5.3f\n", chrom, start, stop, length, max_score);
+	return String.format("%s: %d-%d (l=%d) %d\n", chrom, start, stop, length, n_c);
     }
 
 
@@ -100,7 +103,37 @@ class PhyloBlock {
 	}
     } 
 
-    //    public ArrayList<Interval> mergeXY() {
-    //    }
+     public static ArrayList<Interval> mergeXY(double[] X, double [] Y) {
+	int xi=0;
+	int yj=0;
+	boolean in_y=Y[0]<=X[0];
+	ArrayList<Interval> iList=new ArrayList<Interval>();
+
+	while (xi<X.length && yj<Y.length) {
+	    char p=Y[yj]>X[xi]? '<':'>';
+	    //	    System.out.println(String.format("X[%d]=%5.2f %c Y[%d]=%5.2f",xi, X[xi], p, yj,Y[yj]));
+
+	    if (Y[yj]>=X[xi]) {
+		// if (!in_y) System.out.println("back to Y");
+		yj++;	
+		in_y=true;
+	    } else {
+		xi++;
+		if (in_y) {
+		    Interval i=new Interval(xi,yj-1);
+		    iList.add(i);
+		    // System.out.println("added "+i.toString());
+		}
+		in_y=false;
+	    }
+	}
+	if (xi<X.length) {
+	    Interval i=new Interval(xi+1,yj-1); // I *think* these indices are right
+	    iList.add(i);
+	    // System.out.println("added final "+i.toString());
+	}
+
+	return iList;
+    }
 
 }

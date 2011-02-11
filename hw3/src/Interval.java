@@ -12,6 +12,7 @@ class Interval
     }
 
     public String asString() { return String.format("%d-%d",this.start,this.stop); }
+    public String toString() { return asString(); }
 
     public static boolean overlaps(Interval i1, Interval i2) { return i1.start<=i2.stop && i1.stop>=i2.start; }
     public        boolean overlaps(Interval other) { return overlaps(this,other); }
