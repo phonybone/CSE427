@@ -12,6 +12,10 @@ class Interval
 	this.stop=stop;
     }
 
+    public Interval shiftedBy(int offset) {
+	return new Interval(this.start+offset, this.stop+offset);
+    }
+
     public int length() { return stop-start+1; }
 
     public String asString() { return String.format("%d-%d",this.start,this.stop); }
@@ -80,15 +84,21 @@ class Interval
     public static Interval[] merge_overlaps(Interval[] sorted) {
 	Interval current=sorted[0];
 	ArrayList<Interval> merged=new ArrayList<Interval>();
+	boolean add_last=false;
 	for (int i=1; i<sorted.length; i++) {
+	    System.out.println(String.format("next: %s",sorted[i].toString()));
 	    if (sorted[i].overlaps(current)) {
 		current=current.join(sorted[i]);
+		add_last=true;
 	    } else {
 		merged.add(current);
+		System.out.println(String.format("added %s",current.toString()));
 		current=sorted[i];
+		add_last=false;
 	    }
+	    System.out.println(String.format("current: %s",current.toString()));
 	}
-	if (!current.ne(sorted[sorted.length-1])) {
+	if (add_last) {
 	    merged.add(current);
 	}
 	return merged.toArray(new Interval[merged.size()]);
