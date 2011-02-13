@@ -40,4 +40,13 @@ class StringHelpers {
     public static String insert_every(StringBuffer s, String i, int f) {
 	return insert_every(new String(s),i,f);
     }
+
+    public static int occurences_of(String s, char a) {
+	int l=s.length();
+	int count=0;
+	for (int i=0; i<l; i++) {
+	    if (s.charAt(i)==a) count++;
+	}
+	return count;
+    }
 }

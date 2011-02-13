@@ -10,7 +10,7 @@ use Options;
 BEGIN: {
   Options::use(qw(d q v h fuse=i results:s predictions:s));
     Options::useDefaults(results=>'results',
-			 predictions=>'../../NC_011660.ptt',
+			 predictions=>'NC_011660.ptt',
 			 fuse => -1);
     Options::get();
     die Options::usage() if $options{h};

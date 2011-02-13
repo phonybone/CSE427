@@ -8,8 +8,9 @@ use Options;
 use RaCodons;
 
 BEGIN: {
-  Options::use(qw(d q v h fuse=i ll:i));
+  Options::use(qw(d q v h fuse=i ll:i replicon|r:s));
     Options::useDefaults(fuse => -1,
+			 replicon=>'NC_011660',
 			 ll=>60,
 	);
     Options::get();
@@ -22,7 +23,8 @@ MAIN: {
     my ($start,$stop)=@ARGV;
     die "Missing start and/or stop\n" if (!$start && !$stop);
 
-    my $fc=RaCodons->new(filename=>'/home/victor/random/coursework/CSE427/NC_011660.fna.p');
+    my $filename=$options{replicon}.".fna.p";
+    my $fc=RaCodons->new(filename=>$filename);
     my $seq=$fc->seq_at1($start,$stop);
     my $rseq=comp($seq);
     my $len=length($seq);

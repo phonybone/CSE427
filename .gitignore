@@ -4,5 +4,10 @@
 *.faa
 *.ptt
 *.p
+NC*
 *.class
 *.jar
+*.faa
+#.*
+*.maf
+.#*

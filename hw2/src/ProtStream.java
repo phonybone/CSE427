@@ -24,7 +24,7 @@ class ProtStream {
 		System.err.println(prot_file+": error getting first line of first protein???");
 		System.exit(1);
 	    }
-	    while (! line.startsWith(">")) {
+	    while (line!=null && !line.startsWith(">")) {
 		next_prot.append(line);
 		line=reader.readLine();
 	    }

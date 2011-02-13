@@ -1,0 +1,74 @@
+#!/usr/bin/env perl 
+use strict;
+use warnings;
+use Carp;
+use Data::Dumper;
+ 
+use Options;
+
+
+# New strategy:
+# Break up all protiens into n-tuples (n a command line param, default
+# 3). Index all n-tuples by simple presence (ie, t3->prot exists iff
+# prot contains t3).  
+# For queries, do same index and then see which protiens have the most
+# t3's in common
+
+
+BEGIN: {
+  Options::use(qw(d q v h fuse=i));
+    Options::useDefaults(fuse => -1);
+    Options::get();
+    die Options::usage() if $options{h};
+    $ENV{DEBUG} = 1 if $options{d};
+}
+
+
+sub main {
+    my $prot_file=shift or die "no prot_file";
+    my $prot2counts=index_prots($prot_file);
+    warn Dumper($prot2counts);
+
+}
+
+sub index_prots {
+    my $prot_file=shift or die "no prot_file";
+    my $prot2counts={};
+    open (PROTS,$prot_file) or die "no prot_file";
+    my ($prot_name, $prot_seq);
+    while (<PROTS>) {
+	chomp;
+	if (/^>/) {
+	    if ($prot_name) {
+		warn "$prot_name\n";
+		my $prot2counts=index_prot($prot_seq);
+		$prot2counts->{$prot_name}=$prot2counts;
+	    }
+	    $prot_name=$_;
+	    $prot_seq='';
+	} else {
+	    $prot_seq.=$_;
+	}
+    }
+
+    $prot2counts->{$prot_name}=index_prot($prot_seq); # last one
+    close PROTS;
+    return $prot2counts;
+}
+
+# return a hash: k=t3, v=count
+sub index_prot {
+    my ($prot_seq)=@_;
+    my $prot2counts={};
+    my $l=length($prot_seq)-2;
+    my $i=0;
+    while ($i<$l) {
+	my $t3=substr($prot_seq,$i,3);
+	$prot2counts->{$t3}++;
+	$i++;
+    }
+    $prot2counts;
+}
+
+main(@ARGV);
+

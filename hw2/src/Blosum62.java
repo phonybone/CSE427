@@ -6,9 +6,19 @@ class Blosum62 {
     public int sigma(char A, char B) {
 	int i=A == '-'? 0 : (int)A-(int)'A'+1;
 	int j=B == '-'? 0 : (int)B-(int)'A'+1;
-	return BLOSUM62[i][j];
+	int sigma=0;
+	try {
+	    sigma=BLOSUM62[i][j];
+	} catch (ArrayIndexOutOfBoundsException e) {
+	    System.err.println("BLOSUM62["+String.valueOf(i)+"]["+String.valueOf(j)+"]: out of bounds");
+	    System.err.println("A="+A+", B="+B);
+	    e.printStackTrace();
+	    System.exit(1);
+	}
+	return sigma;
     }
 
+    // The BLOSUM62 matrix, rearranged into alphabetical order.  Also, bogus rows and columns are added for J, O, and U.
     public int[][] BLOSUM62=new int[][] {
 	{   1,   -4,   -4,   -4,   -4,   -4,   -4,   -4,   -4,   -4, -100,   -4,   -4,   -4,   -4, -100,   -4,   -4,   -4,   -4,   -4, -100,   -4,   -4,   -4,   -4,   -4},      // *
 	{  -4,    4,   -2,    0,   -2,   -1,   -2,    0,   -2,   -1, -100,   -1,   -1,   -1,   -2, -100,   -1,   -1,   -1,    1,    0, -100,    0,   -3,    0,   -2,   -1},      // A
