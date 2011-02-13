@@ -9,8 +9,8 @@ class HW2 {
 	String query_file=null;
 	String prots_file=null;
 	try {
-	    query_file=argv[0];
-	    prots_file=argv[1];
+	    prots_file=argv[0];
+	    query_file=argv[1];
 	} catch (ArrayIndexOutOfBoundsException e) {
 	    if (query_file==null) query_file="query.txt";
 	    if (prots_file==null) prots_file="NC_011660.faa";
@@ -30,9 +30,9 @@ class HW2 {
 
 	LocalAlignment best_alignment=null;
 	int fuse=-1;
-	String winner=">gi|217964381|ref|YP_002350059.1| chaperone protein DnaK [Listeria monocytogenes HCC23]";
+	//	String winner=">gi|217964381|ref|YP_002350059.1| chaperone protein DnaK [Listeria monocytogenes HCC23]";
 	while ((subject=prots.next())!=null) {
-	    if (! prots.prot_name().equals(winner)) continue;
+	    //	    if (! prots.prot_name().equals(winner)) continue;
 
 	    LocalAlignment la=new LocalAlignment();
 	    int score=la.score(query,subject);
