@@ -1,6 +1,7 @@
 import java.util.*;
+import java.io.Serializable;
 
-class MultiZBlock {
+class MultiZBlock implements Serializable, Comparable {
     public HashMap org2seq;
     private final String[] list_order={"hg19", 
 				       "mm9",
@@ -63,6 +64,11 @@ class MultiZBlock {
 	return (ChromSeq)org2seq.get(org);
     }
 
+    public String human_chr() {
+	ChromSeq cs=(ChromSeq)(org2seq.get("hg19"));
+	return cs.chrom;
+    }
+
     public String toString() {
 	StringBuffer buf=new StringBuffer();
 	for (int i=0; i<list_order.length; i++) {
@@ -74,5 +80,7 @@ class MultiZBlock {
 	return new String(buf);
     }
 
-    
+    public int compareTo(Object o) {
+	return this.seq.compareTo(o);
+    }
 }

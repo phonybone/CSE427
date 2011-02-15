@@ -133,4 +133,23 @@ class PhyloBlock {
 	return iList;
     }
 
+    // Return the average phyloP score from a portion of the block specified
+    // by the interval.  Get the phyloP scores from Q, but it's necessary to
+    // re-add in the value of c.  
+    public double avg_phylop(Interval i, double c) {
+	double sum=0;
+	for (int j=i.start; j<=i.stop; j++) {
+	    sum+=q[j-start]+c;
+	}
+	return sum/i.length();
+    }
+
+    double[] phyloPOver(Interval i, double c) {
+	double[] p = new double[i.length()];
+	Interval i2=i.shiftedBy(-this.start);
+	for (int j=i2.start; j<=i2.stop; j++) {
+	    p[j-i2.start]=q[j]+c;
+	}
+	return p;
+    }
 }

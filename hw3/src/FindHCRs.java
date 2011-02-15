@@ -3,22 +3,22 @@ import java.util.*;
 
 /*
   This program finds areas of highly conserved alignments from phyloP scores.
-  It writes the output to a file named "hcr.txt", and also to stdout.
+  It writes the output to a file named "hcrs.ser", and also to stdout.
 */
 
-class HW3 {
+class FindHCRs {
     public static void main(String[] argv) {
 	Date start_time=new Date();
 	try {
 	    String[] human_chrs={"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "X", "Y"};
-	    //String[] human_chrs={"11"};	// debugging aid
+	    // String[] human_chrs={"11"};	// debugging aid
 
-	    //Construct the BufferedWriter object
-	    String filename="hcr.txt"; // output file
-	    BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+	    ArrayList<HCR> final_hcrs=new ArrayList();
+	    HashMap chr2HCRs=new HashMap();
 
 	    for (int i=0; i<human_chrs.length; i++) {
-		String phylofile=String.format("/projects/instr/11wi/cse427/phylop/chr%s.phyloP46way.wigFix",human_chrs[i]);
+		String chrom="chr"+human_chrs[i];
+		String phylofile=String.format("/projects/instr/11wi/cse427/phylop/%s.phyloP46way.wigFix",chrom);
 		double c=4.8;
 		PhyloParser pp=new PhyloParser(phylofile,c);
 		PhyloBlock b;
@@ -33,42 +33,49 @@ class HW3 {
 		    b.rFromQ();
 		    b.XFromR();
 		    b.YFromR();
-		    // Do the merge, return if no hcc's found:
-		    ArrayList<Interval> hcc_al=b.mergeXY(); // hcc for "highly conserved candidates"
-		    if (hcc_al.size()==0) continue;
+		    // Do the merge, return if no hcr's found:
+		    ArrayList<Interval> hcr_al=b.mergeXY(); // hcr for "highly conserved candidates"
+		    if (hcr_al.size()==0) continue;
 
-		    // For overlapping hcc's, select the longest
-		    Interval[] hcc=hcc_al.toArray(new Interval[hcc_al.size()]);
-		    Interval longest=hcc[0];
-		    ArrayList<Interval> final_hccs=new ArrayList();
+		    // For overlapping hcr's, select the longest
+		    Interval[] hcr_ints=hcr_al.toArray(new Interval[hcr_al.size()]);
+		    Interval longest=hcr_ints[0];
 		    boolean add_last=false;
-		    for (int j=1; j<hcc.length; j++) {
-			Interval it=hcc[j];
+		    for (int j=1; j<hcr_ints.length; j++) {
+			Interval it=hcr_ints[j];
 			if (it.overlaps(longest)) {
 			    if (it.length() > longest.length()) longest=it;
 			    add_last=true;
 			} else {
-			    final_hccs.add(longest);
+			    HCR hcr=new HCR(chrom, longest, b.phyloPOver(longest,c), c);
+			    final_hcrs.add(hcr);
 			    longest=it;
 			    add_last=false;
+			    System.out.println("found "+hcr.toString());
 			}
 		    }
-		    if (add_last) { final_hccs.add(hcc[hcc.length-1]); }
-		    
-		    // Print out intervals
-		    for (int j=0; j<final_hccs.size(); j++) {
-			System.out.println(String.format("block=%s: longest hcc=%s len=%d",
-							 b.headerString(), final_hccs.get(j), final_hccs.get(j).length()));
-			writer.write(String.format("block=%s: longest hcc=%s len=%d\n",
-						   b.headerString(), final_hccs.get(j), final_hccs.get(j).length()));
-		    }
+		    if (add_last) { 
+			HCR hcr=new HCR(chrom, longest, b.phyloPOver(longest,c), c);
+			final_hcrs.add(hcr);
+			System.out.println("found "+hcr.toString());
+		    }		    
 
 		    if (fuse-- == 0) break;
-		}	    
+		}
+		
+		// Build a HashMap of all our HCRs: k=chrom, v=HCR[]
+		HCR[] HCRs=final_hcrs.toArray(new HCR[final_hcrs.size()]);
+		chr2HCRs.put(chrom,HCRs);
+		final_hcrs.clear();
+		System.out.println(String.format("Added %d HCRs to %s",HCRs.length,chrom));
 	    }
-	    writer.flush();
-	    writer.close();
-	    System.err.println(filename+" written");
+
+	    // Serialize chr2HCRs:
+	    String object_file="hcrs.ser";
+	    ObjectOutputStream oos=new ObjectOutputStream(new FileOutputStream(object_file));
+	    oos.writeObject(chr2HCRs);
+	    oos.close();
+	    System.out.println(object_file+" written");
 
 	} catch (IOException ioe ) {
 	    new Die(ioe);

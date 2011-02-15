@@ -83,7 +83,7 @@ class PhyloParser {
 		   block=currentBlock;
 		   block.setQ(q);
 		   block.max_score=max_score;
-		   System.out.println("line is null; currentBlock is "+currentBlock.headerString());
+		   // System.out.println("line is null; currentBlock is "+currentBlock.headerString());
 	       }
 	       currentBlock=null;
 	   }

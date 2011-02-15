@@ -1,9 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-class Interval 
-//implements Serializable 
-{
+class Interval implements Serializable, Comparable {
     public int start;
     public int stop;
 
@@ -40,8 +38,8 @@ class Interval
     // Question/fixme: how to implement the Comparator interface?
 
 
-    public static boolean eq(Interval i1, Interval i2) { return i1.start==i2.start && i1.stop==i2.stop; }
-    public        boolean eq(Interval other) { return eq(this,other); }
+    public static boolean equals(Interval i1, Interval i2) { return i1.start==i2.start && i1.stop==i2.stop; }
+    public        boolean equals(Interval other) { return equals(this,other); }
     public static boolean ne(Interval i1, Interval i2) { return i1.start!=i2.start || i1.stop!=i2.stop; }
     public        boolean ne(Interval other) { return ne(this,other); }
 
@@ -58,15 +56,19 @@ class Interval
 
 
 
-    public static int cmp(Interval i1, Interval i2) {
-	if (i1.start<i2.start) return -1;
-	if (i1.start==i2.start) {
-	    return i1.stop<i2.stop? -1:
-		i1.stop>i2.stop? 1:0;
+    public int compareTo(Object o) 
+	throws ClassCastException {
+	if (! o instanceOf(Interval)) {
+	    throw new ClassCastException(o.getClass().toString()+": not an Interval");
 	}
-	return 1;		// i1.start>i2.start
+	if (this.start<o.start) return -1;
+	if (this.start==o.start) {
+	    return this.stop<o.stop? -1:
+		this.stop>o.stop? 1:0;
+	}
+	return 1;		// this.start>o.start
     }
-    public int cmp(Interval other) { return cmp(this,other); }
+    public int compare(Interval other) { return compare(this,other); }
 
     public static boolean adjacent(Interval i1, Interval i2) { return i1.stop==i2.start-1 || i2.stop==i1.start-1; }
     public        boolean adjacent(Interval other) { return adjacent(this,other); }
