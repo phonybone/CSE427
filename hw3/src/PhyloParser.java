@@ -77,6 +77,16 @@ class PhyloParser {
 		   if (v>max_score) max_score=v;
 	       } catch (NumberFormatException nfe) { new Die(nfe); }
 	   }
+
+	   if (line==null) {	// last block
+	       if (currentBlock != null) {
+		   block=currentBlock;
+		   block.setQ(q);
+		   block.max_score=max_score;
+		   System.out.println("line is null; currentBlock is "+currentBlock.headerString());
+	       }
+	       currentBlock=null;
+	   }
        } catch (IOException ioe) { new Die(ioe); }
        
        return block; 		// is null if done

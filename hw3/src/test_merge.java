@@ -41,27 +41,26 @@ class test_merge {
 	ArrayList<Interval> iList=new ArrayList<Interval>();
 
 	while (xi<X.length && yj<Y.length) {
-	    char p=Y[yj]>X[xi]? '<':'>';
-	    //	    System.out.println(String.format("X[%d]=%5.2f %c Y[%d]=%5.2f",xi, X[xi], p, yj,Y[yj]));
+	    // char p=Y[yj]>X[xi]? '<':'>';
+	    // System.out.println(String.format("X[%d]=%5.2f %c Y[%d]=%5.2f",xi, X[xi], p, yj,Y[yj]));
 
 	    if (Y[yj]>=X[xi]) {
 		yj++;
-		// if (!in_y) System.out.println("back to Y");
 		in_y=true;
 	    } else {
 		xi++;
 		if (in_y) {
 		    Interval i=new Interval(xi,yj-1);
 		    iList.add(i);
-		    // System.out.println("added "+i.toString());
 		}
 		in_y=false;
 	    }
 	}
+	System.out.println(String.format("end: xi=%d, yj=%d, in_y=%s",xi,yj,(in_y? "true":"false")));
 	if (xi<X.length) {
 	    Interval i=new Interval(xi+1,yj-1); // I *think* these indices are right
 	    iList.add(i);
-	    // System.out.println("added final "+i.toString());
+	    System.out.println("added final "+i.toString());
 	}
 
 	return iList;

@@ -107,27 +107,27 @@ class PhyloBlock {
 	ArrayList<Interval> iList=new ArrayList<Interval>();
 
 	while (xi<X.length && yj<Y.length) {
-	    char p=Y[yj]>X[xi]? '<':'>';
+	    // char p=Y[yj]>X[xi]? '<':'>';
 	    //	    System.out.println(String.format("X[%d]=%5.2f %c Y[%d]=%5.2f",xi, X[xi], p, yj,Y[yj]));
 
 	    if (Y[yj]>=X[xi]) {
-		// if (!in_y) System.out.println("back to Y");
 		yj++;	
 		in_y=true;
 	    } else {
 		xi++;
 		if (in_y && (yj-xi > min_interval)) {
-		    Interval i=new Interval(xi,yj-1);
+		    Interval i=new Interval(xi,yj-1).shiftedBy(this.start);
 		    iList.add(i);
-		    // System.out.println("added "+i.toString());
 		}
 		in_y=false;
 	    }
 	}
-	if (xi<X.length) {
-	    Interval i=new Interval(xi+1,yj-1); // I *think* these indices are right
-	    //iList.add(i);
-	    // System.out.println("added final "+i.toString());
+
+
+	if ((xi<X.length) && (yj-xi > min_interval)) {
+	    Interval i=new Interval(xi+1,yj-1).shiftedBy(this.start); // I *think* these indices are right
+	    iList.add(i);
+	    System.out.println("added final "+i.toString());
 	}
 
 	return iList;
