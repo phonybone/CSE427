@@ -6,7 +6,7 @@
 
 
   <property name='args' value=''/>
-  <property name='main_class' value='AlignHCRs' />
+  <property name='main_class' value='FindHCRs' />
   <property name='jar_name' value="${main_class}.jar"/>
   <property name='jar_file' value="${base_dir}/jar/${jar_name}"/>
 

@@ -7,11 +7,14 @@ public class ChromSeq implements Serializable, Comparable {
     public String seq;
     public Interval interval;
 
+    static final long serialVersionUID = 1003L;
+
+    public ChromSeq() {}	// for serializable
     public ChromSeq(String org, String chrom, String seq, int seq_start) {
 	this.org=org;
 	this.chrom=chrom;
 	this.seq=seq;
-	this.interval=new Interval(seq_start,seq_start+seq.length-1);
+	this.interval=new Interval(seq_start,seq_start+seq.length()-1);
     }
 
     public int length() { return interval.length(); }

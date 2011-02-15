@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import java.lang.*;
 
 /*
   This program reads the list of found HCRs (see FindHCR.java) and prints out the 
@@ -10,13 +11,17 @@ import java.util.*;
 class AlignHCRs {
     public static void main(String[] argv) {
 
+	// Read in serialized HashMap of HCRs
 	String hcr_file="hcrs11.ser";
 	HashMap chr2HCRs=readHCRs(hcr_file); // k=chrX, v=PhyloBlock?
+	dump_chr2HCRs(chr2HCRs);
+	System.exit(1);
 
 	// Look through multiz files for blocks overlapping one of our HCRs:
 	// String[] human_chrs={"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "X", "Y"};
 	String[] human_chrs={"11"};
 	for (int i=0; i<human_chrs.length; i++) {
+	    
 	    String chrom="chr"+human_chrs[i];
 	    HCR[] hcrs=(HCR[])chr2HCRs.get(chrom);
 	    findZBlocks(chrom, hcrs);
@@ -33,18 +38,21 @@ class AlignHCRs {
 	MultiZParser parser=new MultiZParser(multiZfile);
 	MultiZBlock zBlock=null;
 	while ((zBlock=parser.next())!=null) {
-	    ChromSeq cs=zBlock.get("hg19");
+	    ChromSeq cs=zBlock.get("hg19"); 
+	    if (cs==null) continue;
+
 	    for (int j=0; j<hcrs.length; j++) {
-		if (cs.interval.overlaps(hcrs[i].interval)) {
-		    hcrs[i].zBlocks.add(zBlock);
+		if (cs.interval.overlaps(hcrs[j].interval)) {
+		    hcrs[j].zBlocks.add(zBlock);
 		}
 	    }
 	}
     }
 
-    public static String alignZBlocks(HCR hcr) {
+    public static String alignZBlocks(HCR hcr) throws RuntimeException {
 	// sort hcr.zBlocks by starting coord
-	Arrays.sort(hcr.zBlocks); // sorts by human chr interval
+	MultiZBlock[] zBlocks=hcr.zBlocks.toArray(new MultiZBlock[hcr.zBlocks.size()]);
+	Arrays.sort(zBlocks); // sorts by human chr interval
 
 	HashMap<String,StringBuffer> org2seq=new HashMap();
 
@@ -53,15 +61,15 @@ class AlignHCRs {
 	    String org=MultiZBlock.list_order[k];
 	    StringBuffer buf=org2seq.containsKey(org)? org2seq.get(org) : new StringBuffer();
 
-	    buf.append(hcr.zBlocks[0].get(org).seq); // start sequence
-	    for (int i=1; i<hcr.zBlocks.length; i++) {
-		MultiZBlock prevZBlock=hcr.zBlocks[i-1];
-		MultiZBlock thisZBlock=hcr.zBlocks[i];
+	    buf.append(zBlocks[0].get(org).seq); // start sequence
+	    for (int i=1; i<zBlocks.length; i++) {
+		MultiZBlock prevZBlock=zBlocks[i-1];
+		MultiZBlock thisZBlock=zBlocks[i];
 
 		// have to check case where one of these zblocks doesn't have org
 		int gap=thisZBlock.get(org).interval.start - prevZBlock.get(org).interval.stop - 1;
 		if (gap < 0) {
-		    throw new Exception("something's wrong; zblocks overlap");
+		    throw new RuntimeException("something's wrong; zblocks overlap");
 		} else if (gap > 0) {
 		    char[] dashes=new char[gap];
 		    for (int j=0; j<gap; j++) { dashes[j]='-'; } // better way of doing this???
@@ -80,6 +88,7 @@ class AlignHCRs {
 	    // entries from the zblocks.
 	    // within a multiz block, all seqs are of equal length (yay)
 	}
+	return new String("fixme");
     }
 
     public static void dump_chr2HCRs(HashMap chr2HCRs) {

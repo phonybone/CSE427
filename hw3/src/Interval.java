@@ -5,10 +5,13 @@ class Interval implements Serializable, Comparable {
     public int start;
     public int stop;
 
+    static final long serialVersionUID = 1004L;
+
     public Interval(int start, int stop) {
 	this.start=start;
 	this.stop=stop;
     }
+    public Interval() {}	// for serializable
 
     public Interval shiftedBy(int offset) {
 	return new Interval(this.start+offset, this.stop+offset);
@@ -58,17 +61,14 @@ class Interval implements Serializable, Comparable {
 
     public int compareTo(Object o) 
 	throws ClassCastException {
-	if (! o instanceOf(Interval)) {
-	    throw new ClassCastException(o.getClass().toString()+": not an Interval");
+	Interval i=(Interval)o;
+	if (this.start<i.start) return -1;
+	if (this.start==i.start) {
+	    return this.stop<i.stop? -1:
+		this.stop>i.stop? 1:0;
 	}
-	if (this.start<o.start) return -1;
-	if (this.start==o.start) {
-	    return this.stop<o.stop? -1:
-		this.stop>o.stop? 1:0;
-	}
-	return 1;		// this.start>o.start
+	return 1;		// this.start>i.start
     }
-    public int compare(Interval other) { return compare(this,other); }
 
     public static boolean adjacent(Interval i1, Interval i2) { return i1.stop==i2.start-1 || i2.stop==i1.start-1; }
     public        boolean adjacent(Interval other) { return adjacent(this,other); }

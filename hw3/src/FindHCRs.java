@@ -7,15 +7,23 @@ import java.util.*;
 */
 
 class FindHCRs {
+    // public static String[] human_chrs={"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "X", "Y"};
+    public static String[] human_chrs={"11"};	// debugging aid
+    public static HashMap chr2HCRs=new HashMap();
+
+
     public static void main(String[] argv) {
 	Date start_time=new Date();
+
+	findHCRs();
+	findMultiZBlocks();
+	writeMultiZBlocks();
+	Date end_time=new Date();
+	System.err.println(String.format("execution time: %s",new TimeSpan(start_time,end_time)));
+    }
+
+    public static findHCRs() {
 	try {
-	    String[] human_chrs={"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "X", "Y"};
-	    // String[] human_chrs={"11"};	// debugging aid
-
-	    ArrayList<HCR> final_hcrs=new ArrayList();
-	    HashMap chr2HCRs=new HashMap();
-
 	    for (int i=0; i<human_chrs.length; i++) {
 		String chrom="chr"+human_chrs[i];
 		String phylofile=String.format("/projects/instr/11wi/cse427/phylop/%s.phyloP46way.wigFix",chrom);
@@ -24,6 +32,7 @@ class FindHCRs {
 		PhyloBlock b;
 		int n_skipped=0;
 		int fuse=-3;
+		ArrayList<HCR> final_hcrs=new ArrayList();
 		while ((b=pp.nextBlock())!=null) {
 		    if (b.max_score < c) {
 			n_skipped++;
@@ -41,6 +50,7 @@ class FindHCRs {
 		    Interval[] hcr_ints=hcr_al.toArray(new Interval[hcr_al.size()]);
 		    Interval longest=hcr_ints[0];
 		    boolean add_last=false;
+
 		    for (int j=1; j<hcr_ints.length; j++) {
 			Interval it=hcr_ints[j];
 			if (it.overlaps(longest)) {
@@ -80,8 +90,42 @@ class FindHCRs {
 	} catch (IOException ioe ) {
 	    new Die(ioe);
 	}
-
-	Date end_time=new Date();
-	System.err.println(String.format("execution time: %s",new TimeSpan(start_time,end_time)));
     }
+
+
+
+
+    public static findMultiZBlocks() {
+	// uses chr2HCRs as "input"
+	    String multiz_file=String.format("/projects/instr/11wi/cse427/multiz/%s.maf",chrom);
+	    MultiZParser parser=new MultiZParser(multiz_file);
+	    
+
+    }
+
+
+    // Add MultiZBlocks to 
+    public static void findZBlocks() {
+	for (int c=0; c<human_chrs.length; c++) {
+	    String chrom="chr"+human_chrs[c];
+	    String multiZfile=String.format("/projects/instr/11wi/cse427/multiz/%s.maf",chrom);
+	    MultiZParser parser=new MultiZParser(multiZfile);
+	    MultiZBlock zBlock=null;
+
+	    HCR[] hcrs=(HCR[])chr2HCRs.get(chrom);
+
+	    while ((zBlock=parser.next())!=null) {
+		ChromSeq cs=zBlock.get("hg19"); 
+		if (cs==null) continue;
+		
+		for (int j=0; j<hcrs.length; j++) {
+		    if (cs.interval.overlaps(hcrs[j].interval)) {
+			hcrs[j].zBlocks.add(zBlock);
+			System.out.println();
+		    }
+		}
+	    }
+	}
+    }
+
 }

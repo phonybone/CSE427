@@ -3,7 +3,9 @@ import java.io.Serializable;
 
 class MultiZBlock implements Serializable, Comparable {
     public HashMap org2seq;
-    private final static String[] list_order={"hg19", 
+    static final long serialVersionUID = 1002L;
+
+    public final static String[] list_order={"hg19", 
 					      "mm9",
 					      "fr2",
 					      "rn4",
@@ -81,6 +83,6 @@ class MultiZBlock implements Serializable, Comparable {
     }
 
     public int compareTo(Object o) {
-	return this.seq.compareTo(o);
+	return get("hg19").compareTo(o);
     }
 }
