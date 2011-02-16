@@ -7,8 +7,8 @@ import java.util.*;
 */
 
 class FindHCRs {
-    // public static String[] human_chrs={"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "X", "Y"};
-    public static String[] human_chrs={"11"};	// debugging aid
+    public static String[] human_chrs={"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "X", "Y"};
+    // public static String[] human_chrs={"11"};	// debugging aid
     public static HashMap chr2HCRs=new HashMap();
 
 
@@ -16,13 +16,13 @@ class FindHCRs {
 	Date start_time=new Date();
 
 	findHCRs();
-	findMultiZBlocks();
-	writeMultiZBlocks();
+	//	findMultiZBlocks();
+	// writeMultiZBlocks();
 	Date end_time=new Date();
 	System.err.println(String.format("execution time: %s",new TimeSpan(start_time,end_time)));
     }
 
-    public static findHCRs() {
+    public static void findHCRs() {
 	try {
 	    for (int i=0; i<human_chrs.length; i++) {
 		String chrom="chr"+human_chrs[i];
@@ -95,10 +95,11 @@ class FindHCRs {
 
 
 
-    public static findMultiZBlocks() {
+    public static void findMultiZBlocks() {
 	// uses chr2HCRs as "input"
-	    String multiz_file=String.format("/projects/instr/11wi/cse427/multiz/%s.maf",chrom);
-	    MultiZParser parser=new MultiZParser(multiz_file);
+	String chrom="fixme!";
+	String multiz_file=String.format("/projects/instr/11wi/cse427/multiz/%s.maf",chrom);
+	MultiZParser parser=new MultiZParser(multiz_file);
 	    
 
     }

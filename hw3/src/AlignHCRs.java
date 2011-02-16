@@ -12,7 +12,7 @@ class AlignHCRs {
     public static void main(String[] argv) {
 
 	// Read in serialized HashMap of HCRs
-	String hcr_file="hcrs11.ser";
+	String hcr_file="hcrs.ser";
 	HashMap chr2HCRs=readHCRs(hcr_file); // k=chrX, v=PhyloBlock?
 	dump_chr2HCRs(chr2HCRs);
 	System.exit(1);
@@ -21,7 +21,6 @@ class AlignHCRs {
 	// String[] human_chrs={"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "X", "Y"};
 	String[] human_chrs={"11"};
 	for (int i=0; i<human_chrs.length; i++) {
-	    
 	    String chrom="chr"+human_chrs[i];
 	    HCR[] hcrs=(HCR[])chr2HCRs.get(chrom);
 	    findZBlocks(chrom, hcrs);
@@ -44,6 +43,7 @@ class AlignHCRs {
 	    for (int j=0; j<hcrs.length; j++) {
 		if (cs.interval.overlaps(hcrs[j].interval)) {
 		    hcrs[j].zBlocks.add(zBlock);
+		    System.out.println(String.format("Added %s to %s", zBlock.toSring(), hcrs[j].toString()));
 		}
 	    }
 	}

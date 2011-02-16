@@ -66,6 +66,10 @@ class MultiZBlock implements Serializable, Comparable {
 	return (ChromSeq)org2seq.get(org);
     }
 
+    public ChromSeq human_cs() {
+	return (ChromSeq)(org2seq.get("hg19"));
+    }
+
     public String human_chr() {
 	ChromSeq cs=(ChromSeq)(org2seq.get("hg19"));
 	return cs.chrom;
@@ -80,6 +84,10 @@ class MultiZBlock implements Serializable, Comparable {
 	    buf.append("\n");
 	}
 	return new String(buf);
+    }
+
+    public String header() {
+	return String.format("%s", human_cs().toString());
     }
 
     public int compareTo(Object o) {
