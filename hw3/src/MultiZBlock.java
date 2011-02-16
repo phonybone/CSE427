@@ -6,6 +6,7 @@ class MultiZBlock implements Serializable, Comparable {
     public String src_block;		// taken directly from the .maf file
     public String human_chrom;
     public Interval human_interval;
+
     static final long serialVersionUID = 1002L;
 
     public final static String[] list_order={"hg19", 
@@ -95,7 +96,10 @@ class MultiZBlock implements Serializable, Comparable {
     }
 
     public String header() {
-	return String.format("%s", human_cs().toString());
+	String chrom=human_chrom!=null? human_chrom : "???";
+	String intstr=human_interval!=null? human_interval.toString() : "???";
+
+	return String.format("chrom: %s\t%s",chrom,intstr);
     }
 
     public int compareTo(Object o) {
