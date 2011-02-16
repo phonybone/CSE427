@@ -10,40 +10,73 @@ import java.lang.*;
 
 class AlignHCRs {
     public static void main(String[] argv) {
+	Date start_time=new Date();
 
 	// Read in serialized HashMap of HCRs
 	String hcr_file="hcrs.ser";
 	HashMap chr2HCRs=readHCRs(hcr_file); // k=chrX, v=PhyloBlock?
-	dump_chr2HCRs(chr2HCRs);
-	System.exit(1);
+	System.out.println("read "+hcr_file);
 
 	// Look through multiz files for blocks overlapping one of our HCRs:
-	// String[] human_chrs={"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "X", "Y"};
-	String[] human_chrs={"11"};
+	String[] human_chrs={"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "X", "Y"};
+	//String[] human_chrs={"11"};
 	for (int i=0; i<human_chrs.length; i++) {
 	    String chrom="chr"+human_chrs[i];
-	    HCR[] hcrs=(HCR[])chr2HCRs.get(chrom);
-	    findZBlocks(chrom, hcrs);
-	    
-	    // assemble zblocks around each hcr:
-	    for (i=0; i<hcrs.length; i++) {
-		String alignment=alignZBlocks(hcrs[i]);
+	    System.out.println("processing "+chrom);
+	    filterZBlocks(chrom, chr2HCRs);
+	}
+
+	Date end_time=new Date();
+	System.out.println(String.format("execution time: %s",new TimeSpan(start_time,end_time)));
+    }
+
+    public static void filterZBlocks(String chrom, HashMap chr2HCRs) {
+	String multiZfile=String.format("/projects/instr/11wi/cse427/multiz/%s.maf",chrom);
+	MultiZParser parser=new MultiZParser(multiZfile);
+
+	try {
+	    String filtered_multiZfile=String.format("%s.maf.filtered",chrom);
+	    FileWriter writer=new FileWriter(filtered_multiZfile);
+
+	    MultiZBlock zBlock=null;
+	    while ((zBlock=parser.next())!=null) {
+		String z_chrom=zBlock.human_chrom;
+		if (z_chrom==null) continue;
+		Interval zb_int=zBlock.human_interval;
+		if (zb_int==null) continue;
+		HCR[] hcrs=(HCR[])chr2HCRs.get(z_chrom);
+		if (hcrs==null || hcrs.length==0) continue;
+
+		for (int i=0; i<hcrs.length; i++) {
+		    Interval hcr_int=hcrs[i].interval;
+		    if (zb_int.overlaps(hcr_int)) {
+			writer.write(zBlock.src_block);
+			writer.write("\n");
+			System.out.println(zBlock.header());
+		    }
+		}
 	    }
+	    writer.flush();	// close() probably does this for us
+	    writer.close();
+	    System.out.println(filtered_multiZfile+" written");
+	} catch (IOException ioe) {
+	    new Die(ioe);
 	}
     }
 
+    // fixme: this might become obsolete
     public static void findZBlocks(String chrom, HCR[] hcrs) {
 	String multiZfile=String.format("/projects/instr/11wi/cse427/multiz/%s.maf",chrom);
 	MultiZParser parser=new MultiZParser(multiZfile);
 	MultiZBlock zBlock=null;
 	while ((zBlock=parser.next())!=null) {
 	    ChromSeq cs=zBlock.get("hg19"); 
-	    if (cs==null) continue;
+	    if (cs==null) continue; // that block didn't have a human portion (seems unlikely, but hey)
 
 	    for (int j=0; j<hcrs.length; j++) {
 		if (cs.interval.overlaps(hcrs[j].interval)) {
 		    hcrs[j].zBlocks.add(zBlock);
-		    System.out.println(String.format("Added %s to %s", zBlock.toSring(), hcrs[j].toString()));
+		    System.out.println(String.format("Added %s to %s", zBlock.toString(), hcrs[j].toString()));
 		}
 	    }
 	}

@@ -3,6 +3,9 @@ import java.io.Serializable;
 
 class MultiZBlock implements Serializable, Comparable {
     public HashMap org2seq;
+    public String src_block;		// taken directly from the .maf file
+    public String human_chrom;
+    public Interval human_interval;
     static final long serialVersionUID = 1002L;
 
     public final static String[] list_order={"hg19", 
@@ -56,6 +59,11 @@ class MultiZBlock implements Serializable, Comparable {
 
     public MultiZBlock() {
 	org2seq=new HashMap();
+    }
+
+    public MultiZBlock(String src_block) {
+	org2seq=new HashMap();
+	this.src_block=src_block;
     }
 
     public void put(String org, ChromSeq chrseq) {

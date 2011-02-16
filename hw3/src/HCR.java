@@ -28,6 +28,18 @@ class HCR implements Serializable {
 	return String.format("%s %d %d %d %g",chrom,interval.start, interval.stop,length(),avg_phyloP());
     }
 
+    public String fullString() {
+	StringBuffer buf=new StringBuffer();
+	buf.append(toString());
+	buf.append("\n");
+	for (int i=0; i<length(); i++) {
+	    buf.append(String.valueOf(phyloP[i]));
+	    buf.append(" ");
+	}
+	buf.append("\n");
+	return new String(buf);
+    }
+
     // Format for the homework:
     public String report() {
 	return String.format("%s:%s\n%d\n%g\n",chrom,interval.toString(),length(), avg_phyloP());

@@ -18,6 +18,61 @@ class MultiZParser {
 
     private MultiZBlock parseNext() {
 	String line=null;
+	StringBuffer buf=new StringBuffer();
+	Interval intreval=null;
+	MultiZBlock next=new MultiZBlock();
+	try {
+	    while ((line=reader.readLine())!=null) {
+		// System.err.println(line);
+		if (line.matches("^\\s*$")) {
+		    next.src_block=new String(buf);
+		    break;
+		}
+
+		if (line.startsWith("a")) { 
+		    buf.append(line);
+		    buf.append("\n");
+		}
+
+		if (line.startsWith("s")) {
+		    buf.append(line);
+		    buf.append("\n");
+
+		    // Check if this is the human portion:
+		    if (line.startsWith("s hg19")) {
+			extractChromAndInterval(line, next);
+		    }
+		}
+	    }
+	}  catch (IOException ioe) {
+	    new Die(ioe);
+	}
+
+	return next;
+    }
+
+    private void extractChromAndInterval(String line, MultiZBlock zb) {
+	try {
+	    String[] fields=line.split("\\s+");
+	    String org_chrom=fields[1];
+	    String f2[]=org_chrom.split("\\.");
+	    String org=f2[0]; // already know this is "hg19"
+	    String chrom=f2[1];
+	    String start=fields[2];
+	    int istart=Integer.valueOf(start).intValue();
+	    String length=fields[3];
+	    int istop=istart+Integer.valueOf(length).intValue()-1;
+	    zb.human_chrom=chrom;
+	    zb.human_interval=new Interval(istart,istop);
+
+	} catch (ArrayIndexOutOfBoundsException e) {
+	    new Die(e, "cannot extract chrom and line: "+line);
+	}
+    }
+
+
+    private MultiZBlock parseNext_old() {
+	String line=null;
 	MultiZBlock next=null;
 	try {
 	    while ((line=reader.readLine())!=null) {
@@ -57,8 +112,8 @@ class MultiZParser {
 
     public static void main(String[] argv) {
 	MultiZParser mzp=new MultiZParser("chr11.maf");
-	System.out.println(mzp.next());
-	//	System.out.println(mzp.next());
-	//	System.out.println(mzp.next());
+	System.out.println(mzp.next().src_block);
+	System.out.println(mzp.next().src_block);
+	System.out.println(mzp.next().src_block);
     }
 }
