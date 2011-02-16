@@ -19,7 +19,7 @@ class AlignHCRs {
 
 	// Look through multiz files for blocks overlapping one of our HCRs:
 	String[] human_chrs={"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "X", "Y"};
-	//String[] human_chrs={"11"};
+	// String[] human_chrs={"11"};
 	for (int i=0; i<human_chrs.length; i++) {
 	    String chrom="chr"+human_chrs[i];
 	    System.out.println("processing "+chrom);
@@ -30,8 +30,11 @@ class AlignHCRs {
 	System.out.println(String.format("execution time: %s",new TimeSpan(start_time,end_time)));
     }
 
+////////////////////////////////////////////////////////////////////////
+
     public static void filterZBlocks(String chrom, HashMap chr2HCRs) {
 	String multiZfile=String.format("/projects/instr/11wi/cse427/multiz/%s.maf",chrom);
+	// String multiZfile=String.format("/projects/instr/11wi/cse427/multiz/%s.maf.10K",chrom);
 	MultiZParser parser=new MultiZParser(multiZfile);
 
 	try {
@@ -63,6 +66,8 @@ class AlignHCRs {
 	    new Die(ioe);
 	}
     }
+
+////////////////////////////////////////////////////////////////////////
 
     // fixme: this might become obsolete
     public static void findZBlocks(String chrom, HCR[] hcrs) {

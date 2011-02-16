@@ -20,7 +20,7 @@ class MultiZParser {
 	String line=null;
 	StringBuffer buf=new StringBuffer();
 	Interval intreval=null;
-	MultiZBlock next=new MultiZBlock();
+	MultiZBlock next=null;
 	try {
 	    while ((line=reader.readLine())!=null) {
 		// System.err.println(line);
@@ -30,6 +30,7 @@ class MultiZParser {
 		}
 
 		if (line.startsWith("a")) { 
+		    next=new MultiZBlock();
 		    buf.append(line);
 		    buf.append("\n");
 		}
@@ -111,9 +112,12 @@ class MultiZParser {
     }
 
     public static void main(String[] argv) {
-	MultiZParser mzp=new MultiZParser("chr11.maf");
-	System.out.println(mzp.next().src_block);
-	System.out.println(mzp.next().src_block);
-	System.out.println(mzp.next().src_block);
+	MultiZParser mzp=new MultiZParser("chr11.maf.10K");
+	MultiZBlock zBlock;
+	int n=0;
+	while ((zBlock=mzp.next())!=null) {
+	    n++;
+	    System.out.println(String.valueOf(n)+": "+zBlock.header());
+	}
     }
 }
