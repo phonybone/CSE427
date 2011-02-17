@@ -148,14 +148,14 @@ class MultiZBlock implements Serializable, Comparable {
 	populate_hash();
 	StringBuffer buf=new StringBuffer(header()); // start off with the header
 	buf.append(String.format("\n%d columns\n",human_cs().length()));
-	Interval hcr_interval=hcr.interval.offsetBy(human_interval.start);
+	Interval hcr_interval=hcr.interval.shiftedBy(human_interval.start);
 	System.out.println(String.format("hcr_interval: %s\n", hcr_interval.toString()));
-	buf.append(String.format("average phyloP score: %5.3f\n",hcr.average_phyloP(hcr_interval)));
+	buf.append(String.format("average phyloP score: %5.3f\n",hcr.avg_phyloP(hcr_interval)));
 
 	for (int i=0; i<list_order.length; i++) {
 	    buf.append(String.format("%10s %s\n", list_order[i], get(list_order[i]).seq));
 	}
-	buf.append(String.format("           %s\n", hcr.plusString(hcr_interval);
+	buf.append(String.format("           %s\n", hcr.plusString(hcr_interval)));
                                  
 
 	return new String();

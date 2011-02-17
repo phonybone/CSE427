@@ -92,7 +92,7 @@ class MultiZParser {
 			String strand=fields[4];
 			// fields[5] is srcSize
 			String seq=fields[6];
-			next.put(org,new ChromSeq(org,chrom,seq,start));
+			next.put(new ChromSeq(org,chrom,seq,start));
 		    
 		    } catch (ArrayIndexOutOfBoundsException e) {
 			new Die(e, "malformed line?: "+line);
