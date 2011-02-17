@@ -85,13 +85,19 @@ class HCR implements Serializable, Comparable {
     }
 
     public String alignment() {
+	StringBuffer buf=new StringBuffer();
+
 	// Sort the zBlocks:
 	MultiZBlock[] zbs=new MultiZBlock[zBlocks.size()];
 	zbs=(MultiZBlock[])zBlocks.toArray(zbs);
+	
+	for (int i=0; i<zbs.length; i++) {
+	    MultiZBlock zb=zbs[i];
+	    buf.append(zb.alignment(this));
+	    buf.append("\n");
+	}
 
 	
-
-	
-	return new String();
+	return new String(buf);
     }
 }

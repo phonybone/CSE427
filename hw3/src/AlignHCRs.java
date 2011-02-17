@@ -23,23 +23,23 @@ class AlignHCRs {
 	// String[] human_chrs={"11"};
 	for (int i=0; i<human_chrs.length; i++) {
 	    String chrom="chr"+human_chrs[i];
-	    System.out.println("assigning zBlocks from "+chrom);
+	    System.err.println("assigning zBlocks from "+chrom);
 	    assignZBlocks(chrom, chr2HCRs);
 	}
 
 	// get a sorted list of hcrs; sort by chrom, position
-	HCR[] hcrs=(HCR[])chr2HCRs.values().toArray();
-	Arrays.sort(hcrs);
+	// Problem is that we're getting an array of arrays; need to flatten
+	HCR[] sorted_hcrs=get_sorted_hcrs(chr2HCRs);
 	
 	// Show the full alignment for each hcr:
-	for (int i=0; i<hcrs.length; i++) {
-	    HCR hcr=hcrs[i];
-	    System.out.println(hcr.alignment());
+	for (int i=0; i<sorted_hcrs.length; i++) {
+	    HCR hcr=sorted_hcrs[i];
+	    System.err.println(hcr.alignment());
 	    break;		// fixme; debugging aid
 	}
 
 	Date end_time=new Date();
-	System.out.println(String.format("execution time: %s",new TimeSpan(start_time,end_time)));
+	System.err.println(String.format("execution time: %s",new TimeSpan(start_time,end_time)));
     }
 
     // Read the filtered .maf files, assign each zblock to the proper hcr:
@@ -67,6 +67,23 @@ class AlignHCRs {
     }
 
 
+    public static HCR[] get_sorted_hcrs(HashMap<String,HCR[]> chr2HCRs) {
+	Collection v=chr2HCRs.values();
+	Iterator v_it=v.iterator();
+	ArrayList<HCR>sorted_hcrs_al=new ArrayList<HCR>();
+	while (v_it.hasNext()) {
+	    HCR[] hcrs=(HCR[])v_it.next();
+	    for (int i=0; i<hcrs.length; i++) {
+		sorted_hcrs_al.add(hcrs[i]);
+	    }
+	}
+	HCR[] sorted_hcrs=(HCR[])sorted_hcrs_al.toArray(new HCR[sorted_hcrs_al.size()]);
+	Arrays.sort(sorted_hcrs);
+	return sorted_hcrs;
+    }
+
+
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -90,16 +107,16 @@ class AlignHCRs {
 	Iterator it=chr2HCRs.values().iterator();
 	int n_hcrs=0;
 	while (it.hasNext()) { n_hcrs+=((HCR[])it.next()).length;	}
-	System.out.println(String.format("read %s: %d hcrs",hcr_file, n_hcrs));;
+	System.err.println(String.format("read %s: %d hcrs",hcr_file, n_hcrs));;
 
 	if (full) {
 	    Iterator i=chr2HCRs.keySet().iterator();
 	    while (i.hasNext()) {
 		String chrom=(String)i.next();
-		System.out.println(chrom);
+		System.err.println(chrom);
 		HCR[] hcrs=(HCR[])chr2HCRs.get(chrom);
 		for (int j=0; j<hcrs.length; j++) {
-		    System.out.println("  "+hcrs[j].toString());
+		    System.err.println("  "+hcrs[j].toString());
 		}
 	    }
 	}
@@ -138,7 +155,7 @@ class AlignHCRs {
 	    }
 	    writer.flush();	// close() probably does this for us
 	    writer.close();
-	    System.out.println(filtered_multiZfile+" written");
+	    System.err.println(filtered_multiZfile+" written");
 	} catch (IOException ioe) {
 	    new Die(ioe);
 	}
