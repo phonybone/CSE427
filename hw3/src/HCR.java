@@ -1,11 +1,11 @@
 /* 
-   This class represents a HighlyConservedRegion, measured in human chromosome.
+   This class represents a HighlyConservedRegion, "measured" in human chromosome.
  */
 import java.io.*;
 import java.util.*;
 
 
-class HCR implements Serializable {
+class HCR implements Serializable, Comparable {
     public String chrom;		// human
     public Interval interval;		// also human
     public double[] phyloP;		// list of phyloP scores across interval
@@ -51,14 +51,47 @@ class HCR implements Serializable {
 	for (int i=0; i<phyloP.length; i++) { sum+=phyloP[i]; }
 	return sum/interval.length();
     }
+    public double avg_phyloP(int start, int stop) {
+	double sum=0;
+	for (int i=start; i<=stop; i++) { sum+=phyloP[i]; }
+	return sum/(stop-start+1);
+    }
+    public double avg_phyloP(Interval i) {
+	return avg_phyloP(i.start,i.stop);
+    }
 
     // Return a String s such that s[i]=c if phyloP[i]>c, s[i]=nc otherwise
-    public String plusString(char c, char nc) { // could probably come up with a better name for that
-	int len=length();
+    public String plusString(char c, char nc, int start, int stop) { // could probably come up with a better name for that
+	int len=stop-start+1;
 	StringBuffer buf=new StringBuffer(len);
 	for (int i=0; i<len; i++) {
-	    buf.setCharAt(i, phyloP[i]>c? c:nc);
+	    buf.setCharAt(i+start, phyloP[i]>c? c:nc);
 	}
 	return new String(buf);
+    }
+    public String plusString(Interval i) {
+	return plusString('+', ' ', i.start, i.stop);
+    }
+
+
+    public int compareTo(Object o) throws ClassCastException, RuntimeException {
+	HCR other=(HCR)o;
+	if (this.chrom==null || other.chrom==null) throw new RuntimeException("missing chrom(s)");
+	if (this.interval==null || other.interval==null) throw new RuntimeException("missing interval(s)");
+
+	int i=this.chrom.compareTo(other.chrom);
+	if (i!=0) return i;
+	return this.interval.compareTo(other.interval);
+    }
+
+    public String alignment() {
+	// Sort the zBlocks:
+	MultiZBlock[] zbs=new MultiZBlock[zBlocks.size()];
+	zbs=(MultiZBlock[])zBlocks.toArray(zbs);
+
+	
+
+	
+	return new String();
     }
 }

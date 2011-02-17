@@ -38,7 +38,6 @@ class Interval implements Serializable, Comparable {
     // return true, but not 
     //          -------------
     //       --------------------
-    // Question/fixme: how to implement the Comparator interface?
 
 
     public static boolean equals(Interval i1, Interval i2) { return i1.start==i2.start && i1.stop==i2.stop; }
@@ -58,7 +57,8 @@ class Interval implements Serializable, Comparable {
 
 
 
-
+    // Implement Comparable
+    // This allows intervals to be sorted
     public int compareTo(Object o) 
 	throws ClassCastException {
 	Interval i=(Interval)o;
