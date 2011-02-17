@@ -15,16 +15,15 @@ class AlignHCRs {
 	// Read in serialized HashMap of HCRs
 	String hcr_file="hcrs.ser";
 	HashMap<String,HCR[]> chr2HCRs=readHCRs(hcr_file); // k=chrX, v=PhyloBlock?
-	System.out.println("read "+hcr_file);
-	System.exit(1);
+	dump_chr2HCRs(chr2HCRs,hcr_file,false);
+	// System.exit(1);
 	
 	// Look through multiz files for blocks overlapping one of our HCRs:
 	String[] human_chrs={"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "X", "Y"};
 	// String[] human_chrs={"11"};
-
 	for (int i=0; i<human_chrs.length; i++) {
 	    String chrom="chr"+human_chrs[i];
-	    System.out.println("processing "+chrom);
+	    System.out.println("assigning zBlocks from "+chrom);
 	    assignZBlocks(chrom, chr2HCRs);
 	}
 
@@ -36,16 +35,14 @@ class AlignHCRs {
 	for (int i=0; i<hcrs.length; i++) {
 	    HCR hcr=hcrs[i];
 	    System.out.println(hcr.alignment());
+	    break;		// fixme; debugging aid
 	}
 
 	Date end_time=new Date();
 	System.out.println(String.format("execution time: %s",new TimeSpan(start_time,end_time)));
     }
 
-    // Assign the zblock to the proper hcr:
-    // Can't add a new field to HCR w/o having to re-run FindHCRs (because of the Serialization)
-    // So we associate the HCR with a list of zBlocks in a new HashMap
-
+    // Read the filtered .maf files, assign each zblock to the proper hcr:
     public static void assignZBlocks(String chrom, HashMap<String,HCR[]> chr2HCRs) {
 	String multiZfile=String.format("%s.maf.filtered",chrom);
 	MultiZParser parser=new MultiZParser(multiZfile);
@@ -88,14 +85,22 @@ class AlignHCRs {
 	return chr2HCRs;
     }
 
-    public static void dump_chr2HCRs(HashMap chr2HCRs) {
-	Iterator i=chr2HCRs.keySet().iterator();
-	while (i.hasNext()) {
-	    String chrom=(String)i.next();
-	    System.out.println(chrom);
-	    HCR[] hcrs=(HCR[])chr2HCRs.get(chrom);
-	    for (int j=0; j<hcrs.length; j++) {
-		System.out.println("  "+hcrs[j].toString());
+    // See if we read in everything from the .ser file sucessfully
+    public static void dump_chr2HCRs(HashMap chr2HCRs, String hcr_file, boolean full) {
+	Iterator it=chr2HCRs.values().iterator();
+	int n_hcrs=0;
+	while (it.hasNext()) { n_hcrs+=((HCR[])it.next()).length;	}
+	System.out.println(String.format("read %s: %d hcrs",hcr_file, n_hcrs));;
+
+	if (full) {
+	    Iterator i=chr2HCRs.keySet().iterator();
+	    while (i.hasNext()) {
+		String chrom=(String)i.next();
+		System.out.println(chrom);
+		HCR[] hcrs=(HCR[])chr2HCRs.get(chrom);
+		for (int j=0; j<hcrs.length; j++) {
+		    System.out.println("  "+hcrs[j].toString());
+		}
 	    }
 	}
     }
@@ -103,6 +108,7 @@ class AlignHCRs {
 
 ////////////////////////////////////////////////////////////////////////
 
+    // Read the .maf files, filter to output only zBlocks we're interested in
     public static void filterZBlocks(String chrom, HashMap chr2HCRs) {
 	String multiZfile=String.format("/projects/instr/11wi/cse427/multiz/%s.maf",chrom);
 	// String multiZfile=String.format("/projects/instr/11wi/cse427/multiz/%s.maf.10K",chrom);
