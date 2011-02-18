@@ -107,8 +107,9 @@ class MultiZBlock implements Serializable, Comparable {
 	return String.format("%s:%s",chrom,intstr);
     }
 
-    public int compareTo(Object o) {
-	return get("hg19").compareTo(o);
+    public int compareTo(Object o) throws ClassCastException {
+	MultiZBlock zb=(MultiZBlock)o;
+	return human_interval.compareTo(zb.human_interval);
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -145,19 +146,33 @@ class MultiZBlock implements Serializable, Comparable {
     // Return a string for this zBlock as per the homework:
     // 
     public String alignment(HCR hcr) {
+	//	System.err.println("MultiZBlock:alignment() entered");
 	populate_hash();
-	StringBuffer buf=new StringBuffer(header()); // start off with the header
-	buf.append(String.format("\n%d columns\n",human_cs().length()));
-	Interval hcr_interval=hcr.interval.shiftedBy(human_interval.start);
-	System.err.println(String.format("hcr_interval: %s\n", hcr_interval.toString()));
-	buf.append(String.format("average phyloP score: %5.3f\n",hcr.avg_phyloP(hcr_interval)));
+
+	Interval hcr_int=hcr.interval;
+	int offset=hcr_int.start>human_interval.start? hcr_int.start : human_interval.start;
+	//System.err.println(String.format("offest is %d",offset));
+	Interval substr_int=hcr_int.intersection(human_interval).shiftedBy(-offset);
+	//	System.err.println(String.format("substr_int is %s",substr_int.fullString()));
+
+	StringBuffer buf=new StringBuffer(header()); 
+	buf.append(String.format("\n%d columns\n",substr_int.length())); 
+
+	//	System.err.println(String.format("hcr_int: %s (%d)", hcr_int.toString(), hcr_int.length()));
+	//	System.err.println(String.format("human_interval: %s (%d)", human_interval, human_interval.length()));
 
 	for (int i=0; i<list_order.length; i++) {
-	    buf.append(String.format("%10s %s\n", list_order[i], get(list_order[i]).seq));
+	    ChromSeq cs=get(list_order[i]);
+	    if (cs==null) { 
+		//		buf.append(String.format("%s: empty\n", list_order[i])); // fixme
+	    } else {
+		String subseq=get(list_order[i]).seq.substring(substr_int.start, substr_int.stop+1);
+		buf.append(String.format("%10s %s\n", list_order[i], subseq));
+	    }
 	}
-	buf.append(String.format("           %s\n", hcr.plusString(hcr_interval)));
+	buf.append(String.format("phyloP:    %s\n", hcr.plusString(substr_int)));
                                  
 
-	return new String();
+	return new String(buf);
     }
 }

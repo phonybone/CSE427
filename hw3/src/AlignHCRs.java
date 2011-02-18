@@ -15,7 +15,7 @@ class AlignHCRs {
 	// Read in serialized HashMap of HCRs
 	String hcr_file="hcrs.ser";
 	HashMap<String,HCR[]> chr2HCRs=readHCRs(hcr_file); // k=chrX, v=PhyloBlock?
-	dump_chr2HCRs(chr2HCRs,hcr_file,false);
+	int total_hcrs=dump_chr2HCRs(chr2HCRs,hcr_file,false);
 	// System.exit(1);
 	
 	// Look through multiz files for blocks overlapping one of our HCRs:
@@ -23,7 +23,6 @@ class AlignHCRs {
 	// String[] human_chrs={"11"};
 	for (int i=0; i<human_chrs.length; i++) {
 	    String chrom="chr"+human_chrs[i];
-	    System.err.println("assigning zBlocks from "+chrom);
 	    assignZBlocks(chrom, chr2HCRs);
 	}
 
@@ -32,10 +31,12 @@ class AlignHCRs {
 	HCR[] sorted_hcrs=get_sorted_hcrs(chr2HCRs);
 	
 	// Show the full alignment for each hcr:
+	System.out.println("Victor Cassen");
+	System.out.println(String.format("%d Extremely Conserved Elements", total_hcrs));
 	for (int i=0; i<sorted_hcrs.length; i++) {
 	    HCR hcr=sorted_hcrs[i];
-	    System.err.println(hcr.alignment());
-	    break;		// fixme; debugging aid
+	    System.out.println(hcr.alignment());
+	    //break;		// debugging aid
 	}
 
 	Date end_time=new Date();
@@ -48,22 +49,28 @@ class AlignHCRs {
 	MultiZParser parser=new MultiZParser(multiZfile);
 	MultiZBlock zBlock=null;
 
+	int n_zbs=0;
+	int n_hcrs=0;
+	HCR[] hcrs=(HCR[])chr2HCRs.get(chrom);
+	n_hcrs=hcrs.length;
+
 	while ((zBlock=parser.next())!=null) {
 	    String z_chrom=zBlock.human_chrom;
 	    if (z_chrom==null) continue;
 	    Interval zb_int=zBlock.human_interval;
 	    if (zb_int==null) continue;
-	    HCR[] hcrs=(HCR[])chr2HCRs.get(z_chrom);
+
 	    if (hcrs==null || hcrs.length==0) continue;
 	    
 	    for (int i=0; i<hcrs.length; i++) {
 		HCR hcr=hcrs[i];
 		if (zb_int.overlaps(hcr.interval)) {
 		    hcr.zBlocks.add(zBlock);
-		    break;
-		}
+		    n_zbs++;
+		} // don't break after adding block; theoretically possible a zBlock goes with more than one hcr
 	    }
 	}
+	System.err.println(String.format("%6s: %3d zBlocks added to %3d hcrs",chrom, n_zbs, n_hcrs));
     }
 
 
@@ -103,7 +110,7 @@ class AlignHCRs {
     }
 
     // See if we read in everything from the .ser file sucessfully
-    public static void dump_chr2HCRs(HashMap chr2HCRs, String hcr_file, boolean full) {
+    public static int dump_chr2HCRs(HashMap chr2HCRs, String hcr_file, boolean full) {
 	Iterator it=chr2HCRs.values().iterator();
 	int n_hcrs=0;
 	while (it.hasNext()) { n_hcrs+=((HCR[])it.next()).length;	}
@@ -120,6 +127,7 @@ class AlignHCRs {
 		}
 	    }
 	}
+	return n_hcrs;
     }
 
 

@@ -9,4 +9,9 @@ class Die {
     Die(Throwable t) {
 	new Die(t,null);
     }
+
+    Die(String msg) {
+	System.err.println(msg);
+	System.exit(1);
+    }
 }

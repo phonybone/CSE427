@@ -40,37 +40,28 @@ class HCR implements Serializable, Comparable {
 	return new String(buf);
     }
 
-    // Format for the homework:
-    public String report() {
-	return String.format("%s:%s\n%d\n%g\n",chrom,interval.toString(),length(), avg_phyloP());
-    }
 
     public int length() { return interval.length(); }
-    public double avg_phyloP() {
-	double sum=0;
-	for (int i=0; i<phyloP.length; i++) { sum+=phyloP[i]; }
-	return sum/interval.length();
-    }
     public double avg_phyloP(int start, int stop) {
 	double sum=0;
 	for (int i=start; i<=stop; i++) { sum+=phyloP[i]; }
 	return sum/(stop-start+1);
     }
-    public double avg_phyloP(Interval i) {
-	return avg_phyloP(i.start,i.stop);
-    }
+    public double avg_phyloP(Interval i) { return avg_phyloP(i.start,i.stop);}
+    public double avg_phyloP() { return avg_phyloP(0,length()-1); }
 
     // Return a String s such that s[i]=c if phyloP[i]>c, s[i]=nc otherwise
     public String plusString(char c, char nc, int start, int stop) { // could probably come up with a better name for that
 	int len=stop-start+1;
 	StringBuffer buf=new StringBuffer(len);
 	for (int i=0; i<len; i++) {
-	    buf.setCharAt(i+start, phyloP[i]>c? c:nc);
+	    char l=phyloP[i]>this.c? c:nc;
+	    buf.append(l);
 	}
 	return new String(buf);
     }
     public String plusString(Interval i) {
-	return plusString('+', ' ', i.start, i.stop);
+	return plusString('+', '-', i.start, i.stop);
     }
 
 
@@ -86,13 +77,22 @@ class HCR implements Serializable, Comparable {
 
     public String alignment() {
 	StringBuffer buf=new StringBuffer();
+	buf.append(String.format("%s:%s\n",chrom,interval));
+	buf.append(String.format("%d\n",interval.length()));
+	buf.append(String.format("%6.4f\n", avg_phyloP()));
 
 	// Sort the zBlocks:
 	MultiZBlock[] zbs=new MultiZBlock[zBlocks.size()];
 	zbs=(MultiZBlock[])zBlocks.toArray(zbs);
+	Arrays.sort(zbs);
 	
+	//	System.err.println(String.format("hcr: %s",interval.fullString()));
 	for (int i=0; i<zbs.length; i++) {
 	    MultiZBlock zb=zbs[i];
+	    //	    System.err.println(String.format("\nHCR:alignment: zb=%s intersection=%s",
+	    //zb.human_interval.fullString(),
+	    //zb.human_interval.intersection(interval).fullString()));
+	    
 	    buf.append(zb.alignment(this));
 	    buf.append("\n");
 	}

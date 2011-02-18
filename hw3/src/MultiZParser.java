@@ -64,7 +64,8 @@ class MultiZParser {
 	    String length=fields[3];
 	    int istop=istart+Integer.valueOf(length).intValue()-1;
 	    zb.human_chrom=chrom;
-	    zb.human_interval=new Interval(istart,istop);
+	    zb.human_interval=new Interval(istart,istop).shiftedBy(-1); // PhyloP coords and MultiZ coords differ by 1
+	    // or is it +1???	
 
 	} catch (ArrayIndexOutOfBoundsException e) {
 	    new Die(e, "cannot extract chrom and line: "+line);

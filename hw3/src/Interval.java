@@ -21,6 +21,7 @@ class Interval implements Serializable, Comparable {
 
     public String asString() { return String.format("%d-%d",this.start,this.stop); }
     public String toString() { return asString(); }
+    public String fullString() { return String.format("%d-%d (%d)", start, stop, length()); }
 
     public static boolean overlaps(Interval i1, Interval i2) { return i1.start<=i2.stop && i1.stop>=i2.start; }
     public        boolean overlaps(Interval other) { return overlaps(this,other); }
@@ -105,4 +106,19 @@ class Interval implements Serializable, Comparable {
 	}
 	return merged.toArray(new Interval[merged.size()]);
     }
+
+    // Return a new interval based on the intersection of two other intervals
+    // Return null if the two intervals do not overlap
+    public static Interval intersection(Interval i1, Interval i2) {
+	if (!i1.overlaps(i2)) return null;
+	int max_start=i1.start>i2.start? i1.start : i2.start;
+	int min_stop  =i1.stop <i2.stop?  i1.stop  : i2.stop;
+	if (max_start>min_stop) {
+	    new Die(String.format("Interval error: i1=%s, i2=%s, intesection yields %d-%d\n", i1.toString(), i2.toString(), max_start, min_stop));
+	}
+	return new Interval(max_start, min_stop);
+    }
+    public        Interval intersection(Interval other) { return intersection(this, other); }
+    
+    // We'll see if we need union...
 }
