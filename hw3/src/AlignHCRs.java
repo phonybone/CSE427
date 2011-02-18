@@ -32,11 +32,18 @@ class AlignHCRs {
 	
 	// Show the full alignment for each hcr:
 	System.out.println("Victor Cassen");
-	System.out.println(String.format("%d Extremely Conserved Elements", total_hcrs));
+	System.out.println(String.format("%d Extremely Conserved Elements\n", total_hcrs));
 	for (int i=0; i<sorted_hcrs.length; i++) {
 	    HCR hcr=sorted_hcrs[i];
 	    System.out.println(hcr.alignment());
 	    //break;		// debugging aid
+	}
+
+	try {
+	    StringHelpers.spitString(lengthData(chr2HCRs),"length.data");
+	    StringHelpers.spitString(chromDist(chr2HCRs),"chrom.data");
+	} catch (IOException ioe) {
+	    new Die(ioe);
 	}
 
 	Date end_time=new Date();
@@ -130,6 +137,32 @@ class AlignHCRs {
 	return n_hcrs;
     }
 
+
+    // Provide a tab-delimited "file"; each line contains two fields
+    public static String lengthData(HashMap<String,HCR[]> chr2HCRs) {
+	StringBuffer buf=new StringBuffer();
+	Iterator it=chr2HCRs.values().iterator();
+	while (it.hasNext()) {
+	    HCR[] hcrs=(HCR[])it.next();
+	    for (int i=0; i<hcrs.length; i++) {
+		HCR hcr=hcrs[i];
+		buf.append(String.format("%d\n",hcr.length()));
+	    }
+	}
+	return new String(buf);
+    }
+
+    public static String chromDist(HashMap<String,HCR[]> chr2HCRs) {
+	StringBuffer buf=new StringBuffer();
+	Iterator it=chr2HCRs.entrySet().iterator();
+	while (it.hasNext()) {
+	    Map.Entry e=(Map.Entry)it.next();
+	    String chrom=(String)e.getKey();
+	    HCR[] hcrs=(HCR[])e.getValue();
+	    buf.append(String.format("%s\t%d\n",chrom,hcrs.length));
+	}
+	return new String(buf);
+    }
 
 ////////////////////////////////////////////////////////////////////////
 

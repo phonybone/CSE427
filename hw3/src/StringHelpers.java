@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.*;
 
 class StringHelpers {
 
@@ -85,6 +86,8 @@ class StringHelpers {
 	return new String(buf);
     }
 
+
+
     public static void main(String[] argv) {
 	String[] alignment={"abcdefghijklmnopqrstuvwxyz",
 			    "bcdefghijklmnopqrstuvwxyza",
@@ -97,4 +100,12 @@ class StringHelpers {
 	System.err.println(alignStrings(alignment, headers, footers, 1200, 7, 1, 1));
 	System.err.println(alignStrings(alignment, headers, footers, 1200, 13, 1, 1));
     }
+
+
+    public static void spitString(String str, String filename) throws IOException {
+	FileWriter writer=new FileWriter(filename);
+	writer.write(str);
+	writer.close();
+    }
+
 }

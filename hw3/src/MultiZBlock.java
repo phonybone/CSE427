@@ -146,17 +146,17 @@ class MultiZBlock implements Serializable, Comparable {
     // Return a string for this zBlock as per the homework:
     // 
     public String alignment(HCR hcr) {
-	//	System.err.println("MultiZBlock:alignment() entered");
 	populate_hash();
 
 	Interval hcr_int=hcr.interval;
 	int offset=hcr_int.start>human_interval.start? hcr_int.start : human_interval.start;
-	//System.err.println(String.format("offest is %d",offset));
 	Interval substr_int=hcr_int.intersection(human_interval).shiftedBy(-offset);
-	//	System.err.println(String.format("substr_int is %s",substr_int.fullString()));
 
-	StringBuffer buf=new StringBuffer(header()); 
-	buf.append(String.format("\n%d columns\n",substr_int.length())); 
+	StringBuffer buf=new StringBuffer(); 
+	buf.append(String.format("%s:%s\n",hcr.chrom,human_interval.intersection(hcr.interval)));
+	//buf.append(String.format("\n%d\n",substr_int.length()));
+	//buf.append(String.format("%6.4f\n", hcr.avg_phyloP(substr_int)));
+	
 
 	//	System.err.println(String.format("hcr_int: %s (%d)", hcr_int.toString(), hcr_int.length()));
 	//	System.err.println(String.format("human_interval: %s (%d)", human_interval, human_interval.length()));
@@ -170,8 +170,10 @@ class MultiZBlock implements Serializable, Comparable {
 		buf.append(String.format("%10s %s\n", list_order[i], subseq));
 	    }
 	}
-	buf.append(String.format("phyloP:    %s\n", hcr.plusString(substr_int)));
-                                 
+
+	// Only want the relevent portion of seq
+	String substr=get("hg19").seq.substring(substr_int.start, substr_int.stop+1);
+	buf.append(String.format("phyloP:    %s\n", hcr.plusString(substr,substr_int.start)));
 
 	return new String(buf);
     }

@@ -51,17 +51,17 @@ class HCR implements Serializable, Comparable {
     public double avg_phyloP() { return avg_phyloP(0,length()-1); }
 
     // Return a String s such that s[i]=c if phyloP[i]>c, s[i]=nc otherwise
-    public String plusString(char c, char nc, int start, int stop) { // could probably come up with a better name for that
-	int len=stop-start+1;
-	StringBuffer buf=new StringBuffer(len);
-	for (int i=0; i<len; i++) {
-	    char l=phyloP[i]>this.c? c:nc;
-	    buf.append(l);
+    public String plusString(String seq, int offset) {
+	// offset refers to where to start within phyloP
+	StringBuffer buf=new StringBuffer();
+	char[] chars=new char[seq.length()];
+	seq.getChars(0,seq.length(),chars,0);
+
+	int j=0;
+	for (int i=0; i<chars.length; i++) {
+	    buf.append(chars[i]=='-'? ' ' : phyloP[j++]>c? '+':' ');
 	}
 	return new String(buf);
-    }
-    public String plusString(Interval i) {
-	return plusString('+', '-', i.start, i.stop);
     }
 
 
@@ -79,7 +79,7 @@ class HCR implements Serializable, Comparable {
 	StringBuffer buf=new StringBuffer();
 	buf.append(String.format("%s:%s\n",chrom,interval));
 	buf.append(String.format("%d\n",interval.length()));
-	buf.append(String.format("%6.4f\n", avg_phyloP()));
+	buf.append(String.format("%6.4f\n\n", avg_phyloP()));
 
 	// Sort the zBlocks:
 	MultiZBlock[] zbs=new MultiZBlock[zBlocks.size()];
@@ -96,7 +96,7 @@ class HCR implements Serializable, Comparable {
 	    buf.append(zb.alignment(this));
 	    buf.append("\n");
 	}
-
+	buf.append("\n");
 	
 	return new String(buf);
     }
