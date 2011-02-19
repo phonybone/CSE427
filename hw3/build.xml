@@ -1,6 +1,7 @@
 <project name='Hw3' default='build'>
   <property environment="env" />
-  <property name='base_dir' value="${env.HOME}/random/coursework/CSE427/hw3" />
+<!--  <property name='base_dir' value="${env.HOME}/random/coursework/CSE427/hw3" /> -->
+  <property name='base_dir' value='.' />
   <property name='src_dir' value="${base_dir}/src"/>
   <property name='build_dir' value="${base_dir}/bin"/>
 

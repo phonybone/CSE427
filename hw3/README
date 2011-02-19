@@ -1,0 +1,11 @@
+# How to run my program:
+
+# Unpack the vcassen.hw3.tgz to a working directory and unpack it.  It will expand to a directory named vcassen.hw3.
+tar xfz vcassen.hw3.tgz
+
+cd vcassen.hw3
+
+# run the convenience script.  It will call ant to compile the source and then run it.  The output will be written to assignment.txt
+sh run.sh     
+
+# Note: the histograms in charts.txt will be untouched by run.sh

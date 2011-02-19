@@ -1,0 +1,16 @@
+
+
+
+    public String plusString_old(char c, char nc, int start, int stop) { // could probably come up with a better name for that
+	int len=stop-start+1;
+	StringBuffer buf=new StringBuffer(len);
+	for (int i=0; i<len; i++) {
+	    char l=phyloP[i]>this.c? c:nc;
+	    buf.append(l);
+	}
+	return new String(buf);
+    }
+    public String plusString_old(Interval i) {
+	return plusString_old('+', '-', i.start, i.stop);
+    }
+
