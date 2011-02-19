@@ -22,6 +22,13 @@ class UCSCExon extends GenomeFeature {
 	this.strand=strand;
 
     }
+
+    public String toString() {
+	StringBuffer buf=new StringBuffer();
+	buf.append(String.format("%s %s %s exon_num=%d %s %s", ucsc_id, chrom, (symbol==null? "sym=?":symbol), exon_num, interval, strand));
+	return new String(buf);	//
+    }
+
     
     // Parse a line from knownGene.txt; generally contains several exons
     public static UCSCExon[] parseLine(String knownGene) {

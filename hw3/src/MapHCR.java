@@ -18,8 +18,12 @@ class MapHCRs {
 	for (int i=0; i<all_hcrs.length; i++) {
 	    HCRFeature hcr=all_hcrs[i];
 	    int insertIndex=Arrays.binarySearch(ucsc_exons,hcr);
+	    int index=insertIndex>0? insertIndex : -insertIndex;
+	    System.err.println(String.format("hcr %s: insert index=%d, exon=%s", hcr, insertIndex, ucsc_exons[index]));
 
 	    // Check to see if we overlap; if not, is insertIndex-1 closer?
+
+	    
 	}
     }
 
