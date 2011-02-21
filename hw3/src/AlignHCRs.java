@@ -39,6 +39,7 @@ class AlignHCRs {
 	    //break;		// debugging aid
 	}
 
+	// Write length and chrom data
 	try {
 	    StringHelpers.spitString(lengthData(chr2HCRs),"length.data");
 	    StringHelpers.spitString(chromDist(chr2HCRs),"chrom.data");

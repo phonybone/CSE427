@@ -16,6 +16,7 @@ class MapHCRs {
 
 	// Read and sort the UCSC Exons from knownGenes.txt
 	String exonfile="knownGenes.txt";
+	System.err.println("parsing known genes in "+exonfile);
 	UCSCExon[] ucsc_exons=UCSCExon.parse(exonfile);
 	System.err.println("sorting exons");
 	Arrays.sort(ucsc_exons); 
@@ -24,13 +25,13 @@ class MapHCRs {
 	// Load ucsc id -> symbol hash:
 	HashMap<String,String> ucsc2sym=loadUCSC2Sym("ucsc2symbol.csv");
 
-	// Map the HCRs:
+	// Map the HCRs; return a map of location types to int counts
 	HashMap<String,Integer> histo=mapHCRs(all_hcrs, ucsc_exons, ucsc2sym);
 	
 	// Print the histo:
-	System.err.println(String.format("%10s: %d", "exonic", histo.get("overlapping")));
-	System.err.println(String.format("%10s: %d", "intronic", histo.get("intronic")));
-	System.err.println(String.format("%10s: %d", "intergenic", histo.get("intergenic")));
+	System.out.println(String.format("%10s: %d", "exonic", histo.get("overlapping")));
+	System.out.println(String.format("%10s: %d", "intronic", histo.get("intronic")));
+	System.out.println(String.format("%10s: %d", "intergenic", histo.get("intergenic")));
 	
 
 	Date end_time=new Date();
@@ -59,13 +60,13 @@ class MapHCRs {
 	    if (insertIndex>0) { // overlaps; but this case unlikely unless hcr exactly matches exon
 		UCSCExon exon=ucsc_exons[insertIndex];
 		exon.symbol=ucsc2sym.get(exon.ucsc_id);
-		System.err.println(String.format("hcr %s overlaps exon=%s", hcr, ucsc_exons[index]));
+		System.out.println(String.format("hcr %s overlaps exon=%s", hcr, ucsc_exons[index]));
 		incHisto("overlapping", histo);
 
 	    } else if (ucsc_exons[-insertIndex].interval.overlaps(hcr.interval)) { // also overlaps
 		UCSCExon exon=ucsc_exons[-insertIndex];
 		exon.symbol=ucsc2sym.get(exon.ucsc_id);
-		System.err.println(String.format("hcr %s overlaps exon=%s (exonic)", hcr, ucsc_exons[index]));
+		System.out.println(String.format("hcr %s overlaps exon=%s (exonic)", hcr, ucsc_exons[index]));
 		incHisto("overlapping", histo);
 
 	    } else {
@@ -89,7 +90,7 @@ class MapHCRs {
 
 		boolean intronic=bracketing.symbol.equals(closest.symbol);
 		String location=intronic? "intronic" : "intergenic";
-		System.err.println(String.format("hcr %s: closest feature: %s (%s, distance=%d)",
+		System.out.println(String.format("hcr %s: closest feature: %s (%s, distance=%d)",
 						 hcr,closest, location, hcr.distanceTo(closest)));
 		incHisto(location, histo);
 	    }
