@@ -56,6 +56,13 @@ class Interval implements Serializable, Comparable {
     public        boolean ge(Interval other) { return ge(this,other); }
     public        boolean le(Interval other) { return le(this,other); }
 
+    // If two Intervals overlap, the distance between them is defined as 0
+    // Adjacent Intervals also have distance 0 (I guess)
+    // Otherwise, the distance is the start value of the "greater" Interval minus the stop value of the "lesser"
+    public static int distance(Interval i1, Interval i2) {
+	return i1.overlaps(i2)? 0 : i1.lt(i2)? i2.start-i1.stop : i1.start-i2.stop;
+    }
+    public        int distanceTo(Interval other) { return distance(this,other); }
 
 
     // Implement Comparable
@@ -84,6 +91,8 @@ class Interval implements Serializable, Comparable {
     public Interval join(Interval other) { return join(this,other); }
 
 
+    // Take a sorted array of intervals and an Interval array such that any overlapping
+    // Intervals are merged into a single Interval
     public static Interval[] merge_overlaps(Interval[] sorted) {
 	Interval current=sorted[0];
 	ArrayList<Interval> merged=new ArrayList<Interval>();

@@ -25,7 +25,7 @@ class HCR implements Serializable, Comparable {
     }
     
     public String toString() {
-	return String.format("%s %d %d %d %g",chrom,interval.start, interval.stop,length(),avg_phyloP());
+	return String.format("(%s) %s %d %d %d %g",this.getClass().getName(),chrom,interval.start, interval.stop,length(),avg_phyloP());
     }
 
     public String fullString() {

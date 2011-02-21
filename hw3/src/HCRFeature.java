@@ -7,10 +7,16 @@ class HCRFeature extends GenomeFeature {
     public HCR hcr;
 
     public HCRFeature(HCR hcr) {
+	super(hcr.chrom, hcr.interval);
 	this.hcr=hcr;
     }
 
-    public String toString() { return hcr.toString(); }
+    public String toString() {
+	return String.format("%s %s %d %g",
+			     hcr.chrom, interval, hcr.length(), hcr.avg_phyloP());
+    }
+
+    //    public String toString() { return hcr.toString(); }
     public String fullString() { return hcr.fullString(); }
     // we'll see what else we actually need...
 }
