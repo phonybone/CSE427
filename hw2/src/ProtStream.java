@@ -4,6 +4,13 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.IOException;
 
+/*
+  Badly named class; is only sort of a "stream", should not be taken literally.
+  Takes a .faa file and returns (via next()) a series of protein strings extracted
+  from the file.  Returns null on eof.  Does not return header information, only the
+  protein sequence (might be a fixme).
+ */
+
 class ProtStream {
     public BufferedReader reader;
     public String last_prot_name;
@@ -87,5 +94,11 @@ class ProtStream {
 	return this_prot;
     }
 
-
+    public static void main(String[] argv) {
+	ProtStream ps=new ProtStream("NC_011660.faa");
+	String prot;
+	while ((prot=ps.next())!=null) {
+	    System.out.println(prot);
+	}
+    }
 }
