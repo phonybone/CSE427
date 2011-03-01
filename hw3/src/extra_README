@@ -1,0 +1,15 @@
+I've uploaded a text file extra_map_hcrs.txt containing mappings
+between Highly Conserved Regions (aka "HCR", or ECE) and exons (or
+nearest exons).
+
+Each line lists an hcr and exon.  In the case hcrs that are intronic
+or intergenic, the exons listed are the nearest ones (with the
+distance and relationship (either "intronic" or "intergenic" noted).
+For hcrs that overlap exons, they are noted as "exonic" and no
+distance is given.
+
+I've also uploaded the code used to compute these mappings.  Although
+each file starts with "extra_", the classes are not prefixed as such,
+so to compile the code the file names would have have to be renamed.
+Also, there are input files needed that I haven't uploaded.  If you'd
+like to compile and run the code, I can provide these files.
