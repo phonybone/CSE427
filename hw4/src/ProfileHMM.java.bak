@@ -1,0 +1,37 @@
+import java.util.*;
+
+class ProfileHMM {
+    private final int n_aas=26;
+    
+    public double a[][];	// tranisition probs Ajk: i1=M, I, or D; i2=j 
+    public double e[][];	// emission probs Ej(b): i1=
+    
+    
+    // length is the length of strings this PHMM can profile; 
+    public ProfileHMM() {
+    }
+    
+    public void train(Alignment align) {
+	a=new double[3][align.n_rows+2];
+	e=new double[3*align.n_rows][n_aas];
+	
+	
+    }
+
+
+
+    // return the transition probability from state j to state k
+    // j, k are of form "M13", "I32", etc, and must represent a valid transition (ie,
+    // follow a real edge of the graph)
+    public double tr_pr(String j, String k) {
+	
+	return 0;
+    }
+
+    // return the emission probability of char b from state j
+    public double em_pr(String j, char b) {
+	return 0;
+    }
+
+
+}
