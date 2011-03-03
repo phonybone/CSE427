@@ -150,6 +150,9 @@ class ProfileHMM_Node {
 	for (int i=0; i<n_aas; i++) {Eb[i] /= sum;}
     }
 
+    // Return the emission probability of char aa:
+    public double get_em(char aa) { return Eb[aa-'A']; }
+
     public static void main(String[] argv) {
 	ProfileHMM_Node n=new ProfileHMM_Node("M13", false);
 	n.inc_tr("M");

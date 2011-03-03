@@ -1,9 +1,10 @@
 import java.util.*;
 import java.io.*;
+import java.lang.Math.*;
 
 class ProfileHMM {
     public HashMap<String,ProfileHMM_Node> graph; // Graph structure
-
+    public int length;				  // equal to the number of Match states; aka alignment.n_match_cols
 
     // length is the length of strings this PHMM can profile; 
     public ProfileHMM() {
@@ -16,13 +17,13 @@ class ProfileHMM {
 	this.new_node("begin", false, bps);
 	this.new_node("end", false, bps);
 	this.new_node("I0", false, bps);
-	System.out.println(String.format("allocating %d HMM cols",a.n_match_cols));
 	for (int i=1; i<=a.n_match_cols; i++) {
 	    boolean last=i==a.n_match_cols;
 	    this.new_node("M"+String.valueOf(i), last, bps);
 	    this.new_node("I"+String.valueOf(i), last, bps);
 	    this.new_node("D"+String.valueOf(i), last, bps);
 	}
+	this.length=a.n_match_cols;
     }
 
     public void new_node(String state, boolean last, BackgroundProbs bps) {
@@ -68,15 +69,14 @@ class ProfileHMM {
 		cs.inc_tr(ns);
 		if (aa != '-') cs.inc_em(aa);
 
-		System.out.println(String.format("a[%2d][%2d]=%c (%s)   %s ->%s", 
-						 r, c, aa, (align.is_match_col(c)? '*':' '), cs, cs.nextState(ns)));
+		//System.out.println(String.format("a[%2d][%2d]=%c (%s)   %s ->%s", 
+		//r, c, aa, (align.is_match_col(c)? '*':' '), cs, cs.nextState(ns)));
 		cs=get_node(cs.nextState(ns));
 	    }
 	    cs.inc_tr("end");
-	    System.out.println(String.format("last state: %s",  cs));
 
-	    // end state:
-	    System.out.println(String.format("end state: %s\n",  get_node("end")));
+	    //System.out.println(String.format("last state: %s",  cs));
+	    //System.out.println(String.format("end state: %s\n",  get_node("end")));
 	}
 
 	// Normalize values (sort for purposes of debugging):
@@ -86,15 +86,81 @@ class ProfileHMM {
 
 	while (it.hasNext()) {
 	    ProfileHMM_Node s=get_node((String)it.next());
-	    System.out.println(s);
-	    System.out.println(s.Ebs());
+	    //System.out.println(s);
+	    //System.out.println(s.Ebs());
 	    s.normalize_trs();
 	    s.normalize_ems();
-	    System.out.println(s);
-	    System.out.println(s.Ebs());
-	    System.out.println(" ");
+	    //System.out.println(s);
+	    //System.out.println(s.Ebs());
+	    //System.out.println(" ");
 	}
     }
+
+    double viterbi(String path, BackgroundProbs bps) {
+	// Allocate arrays.  
+	// Major index: We need one more element in each because we're 1-based, and 
+	// an additional element in Vi because I0 exists and is meaningful.
+	// Minor index: Again, 1-based.
+	double[][] Vm=new double[this.length][path.length+1];
+	double[][] Vi=new double[this.length+1][path.length+1];
+	double[][] Vd=new double[this.length][path.length+1];
+	double[] Vend=new double[path.length+1];
+	double Vbegin0=0;
+
+	// Establish basis:
+	for (int j=0; j<this.length; j++) {
+	    Vm[j][0]=NEGATIVE_INFINITY;
+	    Vi[j][0]=NEGATIVE_INFINITY;
+	    Vd[j][0]=NEGATIVE_INFINITY;
+	}
+	Vi[this.length]=NEGATIVE_INIFINITY;
+	
+
+	// Basic recurrence:
+	for (int j=1; j<this.length; j++) {
+	    for (int i=0; i<path.length; i++) {
+		char Xi=path.charAt(i);
+		double eMj=get_node("M"+String.valueOf(j)).get_em(Xi);
+		double qXi=bps.pr[Xi];
+
+		Vm[j][i]=log2(eMj/qXi) + 
+		    max3(Vm[j-1][i-1]+log2(get_node("M"+String.valueOf(j-1)).get_tr("M")),
+			 Vi[j-1][i-1]+log2(get_node("I"+String.valueOf(j-1)).get_tr("M")),
+			 Vd[j-1][i-1]+log2(get_node("D"+String.valueOf(j-1)).get_tr("M")));
+
+		double eIj=get_node("I"+String.valueOf(j)).get_em(Xi);
+		Vi[j][i]=log2(eIj/qXi) + 
+		    max3(Vm[j-1][i-1]+log2(get_node("M"+String.valueOf(j-1)).get_tr("I")),
+			 Vm[j-1][i-1]+log2(get_node("I"+String.valueOf(j-1)).get_tr("I")),
+			 Vm[j-1][i-1]+log2(get_node("D"+String.valueOf(j-1)).get_tr("I")));
+
+		Vd[j][i]=
+		    max3(Vm[j-1][i-1]+log2(get_node("M"+String.valueOf(j-1)).get_tr("D")),
+			 Vm[j-1][i-1]+log2(get_node("I"+String.valueOf(j-1)).get_tr("D")),
+			 Vm[j-1][i-1]+log2(get_node("D"+String.valueOf(j-1)).get_tr("D")));
+
+	    }
+	    // Vend[j]
+
+	}
+
+    }
+
+    public String dump_double2d(double[][] Vm) {
+	for (int i=0; i<Vm.length; i++) {
+	    StringBuffer buf=new StringBuffer();
+	    for (int j=0; j<Vm[i].length; j++) {
+		buf.append(String.format("%5.3f ", Vm[i][j]));
+	    }
+	    buf.append("\n");
+	}
+	return new String(buf);
+    }
+
+    private double log2bE=log(2);
+    double log2(double d) { return log(d)/log2bE; }
+    double max3(double d1, double d2, double d3) { return d1>d2? (d1>d3? d1:d3) : (d2>d3? d2:d3); }
+
 
 ////////////////////////////////////////////////////////////////////////
 
