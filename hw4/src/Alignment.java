@@ -7,6 +7,7 @@ class Alignment {
     public char[][] alignment;
     public int match_threshold;
     public int[] matches;	// index is column
+    public int n_match_cols;
 
     private BufferedReader reader;
 
@@ -17,6 +18,7 @@ class Alignment {
 	    new Die(ioe);
 	}
 	this.match_threshold=mt;
+	this.n_match_cols=0;
     }
 
     public Alignment read() {
@@ -55,8 +57,8 @@ class Alignment {
 	}
 
 	// convert arraylist to char[][]:
-	alignment=new char[n_rows][];
-	for (r=0; r<n_rows; r++) {
+	alignment=new char[height()][];
+	for (r=0; r<height(); r++) {
 	    alignment[r]=new String(a.get(r)).toCharArray();
 	}
 
@@ -66,17 +68,23 @@ class Alignment {
 	return this;
     }
 
+    public int height() { return n_rows+1; }
+	
 
+    // For each column, count the number of non-gap ('-') chars; if it is ge our threshold,
+    // annotate that column as a "match" or "starred" column:
     private void annotate_matches() {
 	matches = new int[n_cols];
 
 	for (int c=0; c<n_cols; c++) {
 	    matches[c]=0;
-	    for (int r=0; r<n_rows; r++) {
+	    for (int r=0; r<height(); r++) {
 		if (alignment[r][c]!='-') matches[c]++;
 	    }
+	    if (matches[c] >= match_threshold) n_match_cols++;
 	}
     }
+
 
     public boolean is_match_col(int i) {
 	return matches[i] >= match_threshold;
@@ -85,7 +93,7 @@ class Alignment {
 
     public String toString() {
 	StringBuffer buf=new StringBuffer();
-	buf.append(String.format("%d X %d\n", n_rows, n_cols));
+	buf.append(String.format("%d X %d\n", height(), n_cols));
 	
 	return new String(buf);
     }
@@ -93,7 +101,7 @@ class Alignment {
     public String dump() {
 	StringBuffer buf=new StringBuffer(this.toString());
 	buf.append("\n");
-	for (int r=0; r<n_rows; r++) {
+	for (int r=0; r<height(); r++) {
 	    buf.append(new String(row(r)));
 	    buf.append("\n");
 	}
@@ -111,7 +119,7 @@ class Alignment {
     }
 
     public static void main(String[] argv) {
-	Alignment a=new Alignment("hw2-muscle17.txt.short",8).read();
+	Alignment a=new Alignment("hw2-muscle17.txt.veryshort",8).read();
 	System.out.println(a.dump());
     }
 

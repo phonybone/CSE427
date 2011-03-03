@@ -2,7 +2,7 @@ import java.io.*;
 
 // Background transition and emission probabilities
 
-class BackgroundProbs {
+class BackgroundProbs implements Serializable {
     private final int n_aas=26;
     public double[] probs=new double[n_aas];
 
@@ -32,6 +32,23 @@ class BackgroundProbs {
 	return probs[i];
     }
 
+    // Serialize bps to file
+    public void writeBps(String toFile) throws IOException {
+	ObjectOutputStream oos=new ObjectOutputStream(new FileOutputStream(toFile));
+	oos.writeObject(this);
+	oos.close();
+	System.out.println(toFile+" written");
+    }
+
+    // Deserialize bps from file
+    public static BackgroundProbs readBps(String fromFile)  throws IOException, ClassNotFoundException {
+	BackgroundProbs bps=null;
+	ObjectInputStream ois=new ObjectInputStream(new FileInputStream(fromFile));
+	bps=(BackgroundProbs)ois.readObject();
+	ois.close();
+	return bps;
+    }
+
     public static void main(String[] argv) {
 	ProtStream ps=new ProtStream("NC_011660.faa");
 	BackgroundProbs bps=new BackgroundProbs(ps);
@@ -43,6 +60,12 @@ class BackgroundProbs {
 	}
 	assert(d==1.0);
 	System.out.println(String.format("d=%6.4f",d));
+
+	try {
+	    bps.writeBps("NC_011660.bps.ser");
+	} catch (IOException ioe) {
+	    new Die(ioe);
+	}
     }
 }
 

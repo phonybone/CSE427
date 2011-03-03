@@ -7,17 +7,18 @@ class ProfileHMM_Node {
 
     public double to_m;
     public double to_i;
-    public double to_d;
+    public double to_d;		// convention: also "to_end" if last==true
+    public boolean last;
 
     public double Eb[];	   // emission probabilities out of this state
     private final int Eb_size=26;
     public  final int n_aas=20;
-    private final String skip_aas="[BJOUXZ]";
+    private final String aas_re="[ACDEFGHIKLMNPQRSTVWY]"; // [A-Z]-[BJOUXZ];
 
     private String valid_statename="^[MID]\\d+|begin|end$"; 
 
 
-    public ProfileHMM_Node(String state) 
+    public ProfileHMM_Node(String state, boolean last) 
 	throws ProfileHMM_BadStateException 
     {
 	if (state.matches(valid_statename)) {
@@ -28,12 +29,9 @@ class ProfileHMM_Node {
 	    } else {
 		state_type=state;
 	    }
-	    this.to_m=1.0/3.0;	// 1/3 is prior probability
-	    this.to_i=1.0/3.0;
-	    this.to_d=1.0/3.0;
-	    
+
 	    this.Eb=new double[Eb_size];
-	    for (int i=0; i<Eb_size; i++) { this.Eb[i]=1.0/n_aas; } // set prior probability
+	    this.last=last;
 
 	} else {
 	    // throw exception?
@@ -42,17 +40,43 @@ class ProfileHMM_Node {
 
     }
 
+    public ProfileHMM_Node set_pseudocounts(BackgroundProbs bps) {
+	// Ajk:
+	if (state_type.equals("M"))     { to_m=0.90; to_i=0.05; to_d=0.05; }
+	if (state_type.equals("I"))     { to_m=0.05; to_i=0.90; to_d=0.05; }
+	if (state_type.equals("D"))     { to_m=0.05; to_i=0.05; to_d=0.90; }
+	if (state_type.equals("begin")) { to_m=0.10; to_i=0.45; to_d=0.45; }
+	if (state_type.equals("end"  )) { to_m=0.00; to_i=0.00; to_d=0.00; }
+
+	if (last) {		// oops, rewrite probs: (can never go to m)
+	    if (state_type.equals("D"))     { to_m=0.00; to_i=0.10; to_d=0.90; }
+	    if (state_type.equals("M"))     { to_m=0.00; to_i=0.90; to_d=0.10; }
+	    if (state_type.equals("I"))     { to_m=0.00; to_i=0.90; to_d=0.10; }
+
+	}
+	
+	// Eb(j):
+	for (char aa='A'; aa<='Z'; aa++) { 
+	    if (String.valueOf(aa).matches(aas_re))
+		this.Eb[aa-'A']=bps.pr(aa);
+	}
+	
+	return this;
+    }
+
+
     public String toString() {
 	return String.format("%s (%d): %s=%6.4f %s=%6.4f %s=%6.4f", state, state_num,
 			     nextState("M"), to_m, nextState("I"), to_i, nextState("D"), to_d);
     }
     
+    // Return a string listing the Eb(j) values (eg "A: 0.232 B: 0.093 ...")
     public String Ebs() {
 	StringBuffer buf=new StringBuffer();
 	for (int i=0; i<Eb_size; i++) {
 	    int aa='A'+i;
 	    char[] aaa=new char[1]; aaa[0]=(char)aa; // String(char) doesn't exist, but String(char[]) does
-	    if (new String(aaa).matches(skip_aas)) continue;
+	    if (! new String(aaa).matches(aas_re)) continue;
 	    buf.append(String.format("%c: %.3f ", aa, this.Eb[i]));
 	}
 	return new String(buf);
@@ -62,11 +86,18 @@ class ProfileHMM_Node {
 
     // Generate the name of the kth state following this state, taking into account
     // the structure of the HMM.  This routine is used as a self-check and in toString.
-    public String nextState(String k_type) {
-	if (k_type.equals("I")) {
+    public String nextState(String next_type) {
+	if (next_type.equals("end")) return "end";
+
+	if (next_type.equals("I")) {
 	    return String.format("I%d",state_num);
-	} else {
-	    return String.format("%s%d", k_type, state_num+1);
+
+	} else if (this.last) {
+	    if (next_type.equals("I")) return String.format("I%d",state_num);
+	    else return "end";
+
+	}  else {
+	    return String.format("%s%d", next_type, state_num+1);
 	}
 	
     }
@@ -82,11 +113,8 @@ class ProfileHMM_Node {
 	if      (k_type.equals("M")) return to_m;
 	else if (k_type.equals("I")) return to_i;
 	else if (k_type.equals("D")) return to_d;
+	else if (k_type.equals("end")) return to_d;
 	else throw new ProfileHMM_BadStateException(k);
-    }
-
-    public boolean valid_state(String j) {
-	return true;
     }
 
 
@@ -95,6 +123,7 @@ class ProfileHMM_Node {
 	if      (j.equals("M")) this.to_m+=d;
 	else if (j.equals("I")) this.to_i+=d;
 	else if (j.equals("D")) this.to_d+=d;
+	else if (j.equals("end")) this.to_d+=d;
 	else throw new ProfileHMM_BadStateException(j);
     }
     public void inc_tr(String j) { inc_tr(j,1); }
@@ -122,7 +151,7 @@ class ProfileHMM_Node {
     }
 
     public static void main(String[] argv) {
-	ProfileHMM_Node n=new ProfileHMM_Node("M13");
+	ProfileHMM_Node n=new ProfileHMM_Node("M13", false);
 	n.inc_tr("M");
 	n.inc_tr("D");
 	n.inc_tr("M");
