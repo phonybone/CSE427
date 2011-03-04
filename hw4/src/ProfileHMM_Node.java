@@ -40,30 +40,6 @@ class ProfileHMM_Node {
 
     }
 
-    public ProfileHMM_Node set_pseudocounts(BackgroundProbs bps) {
-	// Ajk:
-	if (state_type.equals("M"))     { to_m=0.90; to_i=0.05; to_d=0.05; }
-	if (state_type.equals("I"))     { to_m=0.05; to_i=0.90; to_d=0.05; }
-	if (state_type.equals("D"))     { to_m=0.05; to_i=0.05; to_d=0.90; }
-	if (state_type.equals("begin")) { to_m=0.10; to_i=0.45; to_d=0.45; }
-	if (state_type.equals("end"  )) { to_m=0.00; to_i=0.00; to_d=0.00; }
-
-	if (last) {		// oops, rewrite probs: (can never go to m)
-	    if (state_type.equals("D"))     { to_m=0.00; to_i=0.10; to_d=0.90; }
-	    if (state_type.equals("M"))     { to_m=0.00; to_i=0.90; to_d=0.10; }
-	    if (state_type.equals("I"))     { to_m=0.00; to_i=0.90; to_d=0.10; }
-
-	}
-	
-	// Eb(j):
-	for (char aa='A'; aa<='Z'; aa++) { 
-	    if (String.valueOf(aa).matches(aas_re))
-		this.Eb[aa-'A']=bps.pr(aa);
-	}
-	
-	return this;
-    }
-
 
     public String toString() {
 	return String.format("%s (%d): %s=%6.4f %s=%6.4f %s=%6.4f", state, state_num,
@@ -103,11 +79,8 @@ class ProfileHMM_Node {
     }
 
 
-    // 
-    public void set_tr(String k, double d) throws ProfileHMM_BadStateException {
-	
-    }
-
+    // Return the transition prob from this state to the given state k.
+    // Convention: if k==end, use to_d.
     public double get_tr(String k) throws ProfileHMM_BadStateException {
 	String k_type=k.substring(0,1);
 	if      (k_type.equals("M")) return to_m;
@@ -119,39 +92,76 @@ class ProfileHMM_Node {
 
 
     // Training methods:
-    public void inc_tr(String j, double d) {
-	if      (j.equals("M")) this.to_m+=d;
-	else if (j.equals("I")) this.to_i+=d;
-	else if (j.equals("D")) this.to_d+=d;
-	else if (j.equals("end")) this.to_d+=d;
-	else throw new ProfileHMM_BadStateException(j);
+    // Increment the count to a given state k by amount d (default d=1, as below)
+    public void inc_tr(String k, double d) {
+	if      (k.equals("M")) this.to_m+=d;
+	else if (k.equals("I")) this.to_i+=d;
+	else if (k.equals("D")) this.to_d+=d;
+	else if (k.equals("end")) this.to_d+=d;
+	else throw new ProfileHMM_BadStateException(k);
     }
-    public void inc_tr(String j) { inc_tr(j,1); }
+    public void inc_tr(String k) { inc_tr(k,1); }
 
+
+
+
+    // Get the transitional (a_jk) pseudocount going to a given state k:
+    public double get_tr_pc(String k) {
+	double psc=0;		// pseudo count
+	if (state_type.equals("M"))     { 
+	    if (k.equals("M")) psc=last? 0.00 : 0.90; 	    
+	    if (k.equals("I")) psc=last? 0.90 : 0.05; 
+	    if (k.equals("D")) psc=last? 0.10 : 0.05; 
+	    // to_m=0.90; to_i=0.05; to_d=0.05; 
+	}
+	if (state_type.equals("I"))     { 
+	    if (k.equals("M")) psc=last? 0.00 : 0.05; 	    
+	    if (k.equals("I")) psc=last? 0.90 : 0.90; 
+	    if (k.equals("D")) psc=last? 0.10 : 0.05; 
+	    // to_m=0.05; to_i=0.90; to_d=0.05; 
+	}
+	if (state_type.equals("D"))     { 
+	    if (k.equals("M")) psc=last? 0.00 : 0.05; 	    
+	    if (k.equals("I")) psc=last? 0.10 : 0.05; 
+	    if (k.equals("D")) psc=last? 0.90 : 0.90; 
+	    //to_m=0.05; to_i=0.05; to_d=0.90; 
+	}
+
+	if (state_type.equals("begin")) { 
+	    if (k.equals("M")) psc=0.10;
+	    if (k.equals("I")) psc=0.45;
+	    if (k.equals("D")) psc=0.45;
+	    // to_m=0.10; to_i=0.45; to_d=0.45; 
+	}
+	if (state_type.equals("end"  )) { 
+	    psc=0.0;
+	    // to_m=0.00; to_i=0.00; to_d=0.00; 
+	}
+	return psc;
+    }
+
+
+    // Normalize the counts to produce probabilities
+    // Pseduocounts: sum will include them, but will include all of them for each of to_[mid].
     public void normalize_trs() {
 	double sum=to_m+to_i+to_d;
-	to_m /= sum;
-	to_i /= sum;
-	to_d /= sum;
+	to_m = (to_m+get_tr_pc("M"))/(sum+get_tr_pc("M"));
+	to_i = (to_i+get_tr_pc("I"))/(sum+get_tr_pc("I"));
+	to_d = (to_d+get_tr_pc("D"))/(sum+get_tr_pc("D"));
     }
 
-    public void inc_em(char aa, double d) {
-	int index=aa-'A';
-	Eb[index]+=d;
-    }
+    public void inc_em(char aa, double d) { Eb[aa-'A']+=d; }
     public void inc_em(char aa) { inc_em(aa,1); }
+    public double get_em(char aa) { return Eb[aa-'A']; }
 
-    public void normalize_ems() {
+
+    public void normalize_ems(BackgroundProbs bps) {
 	double sum=0;
-	for (int i=0; i<n_aas; i++) {sum+=Eb[i];}
-
-	// have to subtract out the elements that were never indexed:
-	sum -= (Eb_size-n_aas)/n_aas; // should be 6/20
-	for (int i=0; i<n_aas; i++) {Eb[i] /= sum;}
+	for (char aa='A'; aa<='Z'; aa++) { sum+=Eb[aa-'A']; }
+	for (char aa='A'; aa<='Z'; aa++) { Eb[aa-'A'] = (Eb[aa-'A'] + bps.pr(aa)) / (sum+bps.pr(aa)); }
     }
 
-    // Return the emission probability of char aa:
-    public double get_em(char aa) { return Eb[aa-'A']; }
+////////////////////////////////////////////////////////////////////////
 
     public static void main(String[] argv) {
 	ProfileHMM_Node n=new ProfileHMM_Node("M13", false);
