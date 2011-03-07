@@ -225,9 +225,9 @@ class ProfileHMM {
 	Vend[0]=Double.NaN;
 	int L=this.length;
 	for (int i=1; i<=path.length()+1; i++) {
-	    Vend[i]=max3(Vm[L][i-1] + log2(get_node("M"+String.valueOf(L)).get_tr("M")),
-			 Vi[L][i-1] + log2(get_node("I"+String.valueOf(L)).get_tr("I")),
-			 Vd[L][i-1] + log2(get_node("D"+String.valueOf(L)).get_tr("D")));
+	    Vend[i]=max3(Vm[L][i-1] + log2(get_node("M"+String.valueOf(L)).get_tr("end")),
+			 Vi[L][i-1] + log2(get_node("I"+String.valueOf(L)).get_tr("end")),
+			 Vd[L][i-1] + log2(get_node("D"+String.valueOf(L)).get_tr("end")));
 	}
 	if (debugging) System.out.println(String.format("%s:\n%s\n", "Vend", d1s(Vend, "Vend")));
 	
@@ -274,7 +274,7 @@ class ProfileHMM {
 	String prot;
 	while ((prot=ps.next())!=null) {
 	    double v=viterbi(prot);
-	    results.add(new ViterbiResult(ps.this_prot_name, prot, v));
+	    results.add(new ViterbiResult(ps.last_prot_name, prot, v));
 	    System.out.println(String.format("%s: %g", ps.this_prot_name, v));
 	}
 	return results;
@@ -310,8 +310,8 @@ class ProfileHMM {
 	String prot_file="NC_011660.faa";
 	boolean align_from_alignment=false;
 	try {
-	    prot_file=argv[1];
-	    align_file=argv[2];
+	    prot_file=argv[0];
+	    align_file=argv[1];
 	    align_from_alignment=argv.length >= 3;
 	} catch (ArrayIndexOutOfBoundsException e) {
 	    // pass
