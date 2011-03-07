@@ -15,9 +15,13 @@
     <delete dir="${build_dir}"/>
   </target>
 
+  <assertions>
+    <enable />
+  </assertions>
+
   <target name="build">
     <mkdir dir="${build_dir}"/>
-    <javac srcdir="${src_dir}" destdir="${build_dir}" debug="on" debuglevel="lines,vars,source" />
+    <javac srcdir="${src_dir}" destdir="${build_dir}" debug="true" debuglevel="lines,vars,source" source="1.6" />
   </target>
 
   <target name="jar" depends="build">

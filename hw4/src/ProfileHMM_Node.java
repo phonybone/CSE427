@@ -1,4 +1,5 @@
 import java.util.regex.*;
+import java.lang.Math.*;
 
 class ProfileHMM_Node {
     public String state;	// must match /^[MID]\d+$/, 'begin', 'end', or I0
@@ -46,6 +47,11 @@ class ProfileHMM_Node {
 			     nextState("M"), to_m, nextState("I"), to_i, nextState("D"), to_d);
     }
     
+    public String rawString() {
+	return String.format("%s (%d): to_m=%6.4f to_i=%6.4f to_d=%6.4f last=%b", state, state_num,
+			     to_m, to_i, to_d, last);
+    }
+
     // Return a string listing the Eb(j) values (eg "A: 0.232 B: 0.093 ...")
     public String Ebs() {
 	StringBuffer buf=new StringBuffer();
@@ -144,10 +150,16 @@ class ProfileHMM_Node {
     // Normalize the counts to produce probabilities
     // Pseduocounts: sum will include them, but will include all of them for each of to_[mid].
     public void normalize_trs() {
-	double sum=to_m+to_i+to_d;
-	to_m = (to_m+get_tr_pc("M"))/(sum+get_tr_pc("M"));
-	to_i = (to_i+get_tr_pc("I"))/(sum+get_tr_pc("I"));
-	to_d = (to_d+get_tr_pc("D"))/(sum+get_tr_pc("D"));
+	double sum=to_m+to_i+to_d+1; // +1 to account for sum of pseudocounts
+	//System.out.println(String.format("normalizing %s: sum=%g", this.rawString(), sum));
+	to_m = (to_m+get_tr_pc("M"))/sum;
+	to_i = (to_i+get_tr_pc("I"))/sum;
+	to_d = (to_d+get_tr_pc("D"))/sum;
+	if (!state.equals("end")) {
+	    Die.assert_true(Math.abs(to_m+to_i+to_d-1.0) < 0.0001,
+			    String.format("%s: probs don't add up to 1 (%g)", rawString(), to_m+to_i+to_d));
+	}
+	// System.out.println(String.format("normalizing %s: sum=%g\n", this.rawString(), sum));
     }
 
     public void inc_em(char aa, double d) { Eb[aa-'A']+=d; }
@@ -156,9 +168,15 @@ class ProfileHMM_Node {
 
 
     public void normalize_ems(BackgroundProbs bps) {
-	double sum=0;
+	double sum=1;		// +1 to account for sum of pseudocounts
 	for (char aa='A'; aa<='Z'; aa++) { sum+=Eb[aa-'A']; }
-	for (char aa='A'; aa<='Z'; aa++) { Eb[aa-'A'] = (Eb[aa-'A'] + bps.pr(aa)) / (sum+bps.pr(aa)); }
+	double check=0;
+	for (char aa='A'; aa<='Z'; aa++) { 
+	    Eb[aa-'A'] = (Eb[aa-'A'] + bps.pr(aa)) / sum;
+	    check+=Eb[aa-'A'];
+	}
+	Die.assert_true(Math.abs(check-1.00)<0.0001, String.format("%s: Em(b)'s don't add up to 1 (%g) (sum=%g)\n%s", 
+						   rawString(), check, sum, Ebs()));
     }
 
 ////////////////////////////////////////////////////////////////////////

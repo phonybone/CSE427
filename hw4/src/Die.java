@@ -14,4 +14,10 @@ class Die {
 	System.err.println(msg);
 	System.exit(1);
     }
+
+    public static void assert_true(boolean condition, String msg) {
+	if (!condition) {
+	    new Die(msg);
+	}
+    }
 }

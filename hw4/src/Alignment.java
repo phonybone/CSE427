@@ -8,6 +8,7 @@ class Alignment {
     public int match_threshold;
     public int[] matches;	// index is column
     public int n_match_cols;
+    public String[] names;
 
     private BufferedReader reader;
 
@@ -26,6 +27,9 @@ class Alignment {
 
 	ArrayList<StringBuffer> a=new ArrayList<StringBuffer>();
 	a.add(new StringBuffer()); // first row
+
+	ArrayList<StringBuffer>name_bufs=new ArrayList<StringBuffer>();
+
 	n_rows=0;		 // count rows
 	n_cols=0;
 
@@ -45,10 +49,12 @@ class Alignment {
 		    // Get row to append to:
 		    while (r>n_rows) {
 			a.add(new StringBuffer());
+			name_bufs.add(new StringBuffer(fields[0]));
 			n_rows++;
 		    }
 		    a.get(r).append(fields[1]);
 		    if (a.get(r).length() > n_cols) n_cols=a.get(r).length();
+		    
 		    r++;
 		}
 	    }
@@ -60,6 +66,12 @@ class Alignment {
 	alignment=new char[height()][];
 	for (r=0; r<height(); r++) {
 	    alignment[r]=new String(a.get(r)).toCharArray();
+	}
+
+	// Store names:
+	this.names=new String[n_rows];
+	for (int i=0; i<n_rows; i++) {
+	    this.names[i]=new String(name_bufs.get(i));
 	}
 
 	// Annotate matching cols
@@ -93,7 +105,7 @@ class Alignment {
 
     public String toString() {
 	StringBuffer buf=new StringBuffer();
-	buf.append(String.format("%d X %d\n", height(), n_cols));
+	buf.append(String.format("%d X %d", height(), n_cols));
 	
 	return new String(buf);
     }
