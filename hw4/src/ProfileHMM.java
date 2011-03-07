@@ -107,7 +107,6 @@ class ProfileHMM {
 	double[][] Vd=new double[this.length+1][path.length()+1];
 	double[] Vend=new double[path.length()+2];
 	double[] Vbegin=new double[path.length()+1];;
-	double best_score[]=new double[path.length()+1];
 
 	// Establish basis:
 	for (int j=0; j<this.length; j++) {
@@ -124,7 +123,6 @@ class ProfileHMM {
 	for (int i=0; i<path.length()+1; i++) {
 	    Vm[0][i]=Double.NaN;
 	    Vd[0][i]=Double.NaN;
-	    best_score[i]=Double.NEGATIVE_INFINITY;
 	}
 
 	// begin and end states:
@@ -170,7 +168,6 @@ class ProfileHMM {
 	    char Xi=path.charAt(i-1); // strings are still 0-based
 	    double qXi=bps.pr(Xi);
 	    //System.out.println(String.format("\n%c: qXi=%g", Xi, qXi));
-	    String best_state=null;
 
 	    for (int j=2; j<=this.length; j++) {
 		double eMj=get_node("M"+String.valueOf(j)).get_em(Xi);
@@ -196,22 +193,7 @@ class ProfileHMM {
 
 		//System.out.println(String.format("Vd[%d][%d]=%g", j, i, Vd[j][i]));
 
-		// Calculate current best score for debugging:
-		if (Vm[j][i] > Vi[j][i]) {
-		    if (Vm[j][i] > Vd[j][i]) {
-			best_score[i]=Vm[j][i]; best_state="M"+String.valueOf(i);
-		    } else {
-			best_score[i]=Vd[j][i]; best_state="D"+String.valueOf(i);
-		    }
-		} else {
-		    if (Vi[j][i] > Vd[j][i]) {
-			best_score[i]=Vi[j][i]; best_state="I"+String.valueOf(i);
-		    } else {
-			best_score[i]=Vd[j][i]; best_state="D"+String.valueOf(i);
-		    }	
-		}
 	    }
-	    //System.out.println(String.format("%c: best_score[%d]: %s %g", Xi, i, best_state, best_score[i]));
 	}
 
 	if (1==0) {
