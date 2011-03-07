@@ -257,7 +257,7 @@ class ProfileHMM {
 	while ((prot=ps.next())!=null) {
 	    double v=viterbi(prot);
 	    results.add(new ViterbiResult(ps.last_prot_name, prot, v));
-	    System.out.println(String.format("%s: %g", ps.this_prot_name, v));
+	    System.out.println(String.format("%s: %g", ps.last_prot_name, v));
 	}
 	return results;
     }

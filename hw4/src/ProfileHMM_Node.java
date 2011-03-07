@@ -92,7 +92,7 @@ class ProfileHMM_Node {
 	if      (k_type.equals("M")) return to_m;
 	else if (k_type.equals("I")) return to_i;
 	else if (k_type.equals("D")) return to_d;
-	else if (k_type.equals("end")) return to_d;
+	else if (k.equals("end")) return to_d;
 	else throw new ProfileHMM_BadStateException(k);
     }
 
