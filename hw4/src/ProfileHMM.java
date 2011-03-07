@@ -291,10 +291,10 @@ class ProfileHMM {
 	return results;
     }
 
-    public static BackgroundProbs get_bgprobs() {
+    public static BackgroundProbs get_bgprobs(String bps_file) {
 	BackgroundProbs bps=null;
 	try {
-	    bps=BackgroundProbs.readBps("NC_011660.bps.ser");
+	    bps=BackgroundProbs.readBps(bps_file);
 	} catch (IOException ioe) {
 	    new Die(ioe);
 	} catch (ClassNotFoundException e) {
@@ -310,8 +310,8 @@ class ProfileHMM {
 	String prot_file="NC_011660.faa";
 	boolean align_from_alignment=false;
 	try {
-	    align_file=argv[1];
-	    prot_file=argv[2];
+	    prot_file=argv[1];
+	    align_file=argv[2];
 	    align_from_alignment=argv.length >= 3;
 	} catch (ArrayIndexOutOfBoundsException e) {
 	    // pass
@@ -320,7 +320,9 @@ class ProfileHMM {
 	Alignment a=new Alignment(align_file,8).read();
 	System.out.println(String.format("using alignment %s from %s", a, align_file));
 
-	BackgroundProbs bps=get_bgprobs();
+	String bps_file=prot_file.replaceAll(".faa", ".bps.ser");
+	BackgroundProbs bps=get_bgprobs(bps_file);
+	System.out.println("Using background probs in "+bps_file);
 	ProfileHMM hmm=new ProfileHMM();
 	hmm.train(a, bps);
 
@@ -330,7 +332,8 @@ class ProfileHMM {
 	} else {
 	    results=hmm.align_genome(prot_file);
 	}
-
+	
+	System.out.println("Sorted results:");
 	ViterbiResult[] sorted=results.toArray(new ViterbiResult[results.size()]);
 	Arrays.sort(sorted);
 	for (int i=0; i<sorted.length; i++) {

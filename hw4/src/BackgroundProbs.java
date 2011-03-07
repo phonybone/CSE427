@@ -12,6 +12,7 @@ class BackgroundProbs implements Serializable {
 	String prot;
 	int n_prots=0;
 	while ((prot=ps.next())!=null) {
+	    //System.out.println("prot is "+prot);
 	    n_prots++;
 	    char[] chars=prot.toCharArray();
 	    total_aas+=chars.length;
@@ -50,7 +51,15 @@ class BackgroundProbs implements Serializable {
     }
 
     public static void main(String[] argv) {
-	ProtStream ps=new ProtStream("NC_011660.faa");
+	String prot_file="NC_011660.faa";
+	try {
+	    prot_file=argv[0];
+	} catch (ArrayIndexOutOfBoundsException e) {
+	    // pass
+	}
+	ProtStream ps=new ProtStream(prot_file);
+	System.out.println("using "+prot_file);
+
 	BackgroundProbs bps=new BackgroundProbs(ps);
 	
 	double d=0;
@@ -61,8 +70,11 @@ class BackgroundProbs implements Serializable {
 	assert(d==1.0);
 	System.out.println(String.format("d=%6.4f",d));
 
+	String output_file=prot_file;
+	output_file=output_file.replaceAll(".faa", ".bps.ser");
+	System.out.println("output_file is "+output_file);
 	try {
-	    bps.writeBps("NC_011660.bps.ser");
+	    bps.writeBps(output_file);
 	} catch (IOException ioe) {
 	    new Die(ioe);
 	}
