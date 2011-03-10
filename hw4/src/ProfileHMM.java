@@ -106,6 +106,8 @@ class ProfileHMM {
 	ProtStream ps=new ProtStream(prot_file);
 	ArrayList<ViterbiResult> results=new ArrayList<ViterbiResult>();
 	String prot;
+	ArrayList<String>bt_alignment=new ArrayList<String>();
+
 	while ((prot=ps.next())!=null) {
 	    Viterbi viterbi=new Viterbi(this, prot, bps);
 	    double score=viterbi.score();
@@ -117,9 +119,16 @@ class ProfileHMM {
 	    if (score>0) { 
 		String alignment=viterbi.backtrace(); 
 		System.out.println("alignment is "+alignment);
+		bt_alignment.add(alignment);
 	    }
 
 	    //break;
+	}
+
+	Iterator it=bt_alignment.iterator();
+	System.out.println("bt alignment:");
+	while (it.hasNext()) {
+	    System.out.println(it.next());
 	}
 	return results;
     }

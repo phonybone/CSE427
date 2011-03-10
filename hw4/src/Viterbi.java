@@ -202,7 +202,8 @@ class Viterbi {
 							     j, i, Vm[j][i], from_m, from_i, from_d));
 		    new Die(String.format("Can't determine backtrace from %s, M", cs.state));
 		}
-		buf.append(hmm.alignment.is_match_col(j)? Xi:"!");
+		//buf.append(hmm.alignment.is_match_col(j)? Xi:"!");
+		buf.append(Xi);
 
 	    } else if (cs.state_type.equals("I")) {
 		from_m = DH.log2(eIj/qXi) + Vm[j][i-1] + DH.log2(hmm.get_node("M"+String.valueOf(j-1)).get_tr("I"));
@@ -224,7 +225,8 @@ class Viterbi {
 						     j, i, Vi[j][i], DH.log2(eIj/qXi), from_m, from_i, from_d));
 		    new Die(String.format("Can't determine backtrace from %s, I", cs.state));
 		}
-		buf.append(hmm.alignment.is_match_col(j)? Xi:"?");
+		//buf.append(hmm.alignment.is_match_col(j)? Xi:"?");
+		//buf.append(Xi);
 
 	    } else if (cs.state_type.equals("D")) {
 		from_m =                    Vm[j-1][i] + DH.log2(hmm.get_node("M"+String.valueOf(j-1)).get_tr("D"));
@@ -247,19 +249,22 @@ class Viterbi {
 			new Die(String.format("Can't determine backtrace from %s, D", cs.state));
 		    }
 		}
-
 		String s=hmm.alignment.is_match_col(j)? "-":"";
-		buf.append(s);
+		//buf.append(s);
+		buf.append(Xi);
+
 
 	    } else {
 		new Die(String.format("unknown state_type??? %s", cs.state_type));
 	    }
+	    System.out.println(String.format("%c: next cs is %s, buf is %s", path.charAt(i-1), cs.state, buf.toString()));
+
 	}
 	
 	//System.out.println(String.format("now what? i=%d, j=%d", i, j));
 	while (i>0) {
 	    cs=hmm.get_node("I"+String.valueOf(i-1));
-	    //System.out.println(String.format("%c: next cs is %s (countdown)", path.charAt(i-1), cs.state));
+	    System.out.println(String.format("%c: next cs is %s (countdown), buf is %s", path.charAt(i-1), cs.state, buf.toString()));
 	    buf.append(path.charAt(i-1));
 	    i--;
 	}
