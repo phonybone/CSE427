@@ -95,7 +95,7 @@ class ProtStream {
     }
 
     public static void main(String[] argv) {
-	ProtStream ps=new ProtStream("NC_011660.faa");
+	ProtStream ps=new ProtStream("hw2-muscle17.txt.veryshort.faa");
 	String prot;
 	while ((prot=ps.next())!=null) {
 	    System.out.println(prot);
