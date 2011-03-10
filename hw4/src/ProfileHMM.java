@@ -29,6 +29,7 @@ class ProfileHMM {
 	}
 	this.length=a.n_match_cols;
 	this.bps=bps;
+	this.alignment=a;
     }
 
     public void new_node(String state, boolean last) {
@@ -113,7 +114,10 @@ class ProfileHMM {
 	    results.add(new ViterbiResult(ps.last_prot_name, prot, score));
 	    // System.out.println(String.format("%s: %g", ps.last_prot_name, score));
 	    
-	    if (score>0) { viterbi.backtrace(); }
+	    if (score>0) { 
+		String alignment=viterbi.backtrace(); 
+		System.out.println("alignment is "+alignment);
+	    }
 
 	    //break;
 	}

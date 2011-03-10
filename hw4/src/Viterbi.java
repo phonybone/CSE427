@@ -152,9 +152,8 @@ class Viterbi {
     public String backtrace() {
 	ProfileHMM_Node cs=hmm.get_node("end");
 	int j=hmm.length;
-	System.out.println(String.format("j=hmm.length=%d", j));
 	int i=path.length()+1;
-	System.out.println(String.format("path is %s (%d)", path, path.length()));
+	// System.out.println(String.format("path is %s (%d)", path, path.length()));
 	double epsilon=1E-4;
 	StringBuffer buf=new StringBuffer();
 
@@ -177,16 +176,12 @@ class Viterbi {
 
 	i=path.length();
 	while (j >= 2) {
-	    System.out.println(String.format("\nj=%d, i=%d, cs is %s", j, i, cs.state));
+	    //System.out.println(String.format("\nj=%d, i=%d, cs is %s", j, i, cs.state));
 	    char Xi=path.charAt(i-1); // strings are still 0-based
 	    double qXi=bps.pr(Xi);
 	    double eMj=hmm.get_node("M"+String.valueOf(j)).get_em(Xi);
 	    double eIj=hmm.get_node("I"+String.valueOf(j)).get_em(Xi);
 	    //System.out.println(String.format("i=%d, j=%d, eM%d('%c')=%g, eI%d('%c')=%g", i, j, j, Xi, eMj, j, Xi, eIj));
-
-	    ArrayList<String> possible_states=new ArrayList<String>();
-	    boolean dec_i=false;
-	    boolean dec_j=false;
 
 	    // dec i only if we inc'd i during basic recurrence (ie, not a delete state), likewise j
 	    if (cs.state_type.equals("M")) {
@@ -195,124 +190,82 @@ class Viterbi {
 		from_d = DH.log2(eMj/qXi) + Vm[j-1][i-1] + DH.log2(hmm.get_node("D"+String.valueOf(j-1)).get_tr("M"));
 
 		if (Math.abs(from_m-Vm[j][i]) < epsilon) {
-		    possible_states.add("M"+String.valueOf(j-1));
-		    dec_i=true; dec_j=true;
-		    //cs=hmm.get_node("M"+String.valueOf(j-1));
-		    //j--; i--;
+		    cs=hmm.get_node("M"+String.valueOf(j-1)); j--; i--;
 		} 
-		if (Math.abs(from_i-Vm[j][i]) < epsilon) {
-		    possible_states.add("I"+String.valueOf(j-1));
-		    dec_i=true; dec_j=true;
-		    //cs=hmm.get_node("I"+String.valueOf(j-1));
-		    //j--; i--;
-
+		else if (Math.abs(from_i-Vm[j][i]) < epsilon) {
+		    cs=hmm.get_node("I"+String.valueOf(j-1)); j--; i--;
 		} 
-		if (Math.abs(from_i-Vm[j][i]) < epsilon) {
-		    possible_states.add("D"+String.valueOf(j-1));
-		    dec_i=true; dec_j=true;
-		    //cs=hmm.get_node("D"+String.valueOf(j-1));
-		    //j--; i--;
-
-		    /*
+		else if (Math.abs(from_i-Vm[j][i]) < epsilon) {
+		    cs=hmm.get_node("D"+String.valueOf(j-1)); j--; i--;
 		} else {
-		    dump();
-		    System.out.println(String.format("M: Vm[%d][%d]=%g, from_m = %g, from_i=%g, from_d=%g", j, i, Vm[j][i], from_m, from_i, from_d));
+		    dump(); System.out.println(String.format("M: Vm[%d][%d]=%g, from_m = %g, from_i=%g, from_d=%g", 
+							     j, i, Vm[j][i], from_m, from_i, from_d));
 		    new Die(String.format("Can't determine backtrace from %s, M", cs.state));
-		    */
 		}
+		buf.append(hmm.alignment.is_match_col(j)? Xi:"!");
 
-	    } 
-	    if (cs.state_type.equals("I")) {
+	    } else if (cs.state_type.equals("I")) {
 		from_m = DH.log2(eIj/qXi) + Vm[j][i-1] + DH.log2(hmm.get_node("M"+String.valueOf(j-1)).get_tr("I"));
-		from_i = DH.log2(eIj/qXi) + Vi[j][i-1] + DH.log2(hmm.get_node("I"+String.valueOf(j-1)).get_tr("I")); // should be ...(j).get_tr("I")?
+		// next: should be ...(j).get_tr("I")?
+		from_i = DH.log2(eIj/qXi) + Vi[j][i-1] + DH.log2(hmm.get_node("I"+String.valueOf(j-1)).get_tr("I")); 
 		from_d = DH.log2(eIj/qXi) + Vd[j][i-1] + DH.log2(hmm.get_node("D"+String.valueOf(j-1)).get_tr("I"));
 
 		if (Math.abs(from_m-Vi[j][i]) < epsilon) {
-		    possible_states.add("M"+String.valueOf(j-1));
-		    dec_i=true; 
-		    //cs=hmm.get_node("M"+String.valueOf(j-1));
-		    //i--;
-
+		    cs=hmm.get_node("M"+String.valueOf(j-1)); i--;
 		} 
-		if (Math.abs(from_i-Vi[j][i]) < epsilon) {
-		    possible_states.add("I"+String.valueOf(j));
-		    dec_i=true; 
-		    //cs=hmm.get_node("I"+String.valueOf(j));
-		    //i--;
-
+		else if (Math.abs(from_i-Vi[j][i]) < epsilon) {
+		    cs=hmm.get_node("I"+String.valueOf(j)); i--;
 		} 
-		if (Math.abs(from_d-Vi[j][i]) < epsilon) {
-		    possible_states.add("D"+String.valueOf(j-1));
-		    dec_i=true; 
-		    //cs=hmm.get_node("D"+String.valueOf(j-1));
-		    //i--;
-
-		    /*
+		else if (Math.abs(from_d-Vi[j][i]) < epsilon) {
+		    cs=hmm.get_node("D"+String.valueOf(j-1)); i--;
 		} else {
 		    dump();
-		    System.out.println(String.format("I: Vi[%d][%d]=%g, (%g) from_m = %g, from_i=%g, from_d=%g", j, i, Vi[j][i], DH.log2(eIj/qXi), from_m, from_i, from_d));
+		    System.out.println(String.format("I: Vi[%d][%d]=%g, (%g) from_m = %g, from_i=%g, from_d=%g", 
+						     j, i, Vi[j][i], DH.log2(eIj/qXi), from_m, from_i, from_d));
 		    new Die(String.format("Can't determine backtrace from %s, I", cs.state));
-		    */
 		}
+		buf.append(hmm.alignment.is_match_col(j)? Xi:"?");
 
-	    } 
-	    if (cs.state_type.equals("D")) {
+	    } else if (cs.state_type.equals("D")) {
 		from_m =                    Vm[j-1][i] + DH.log2(hmm.get_node("M"+String.valueOf(j-1)).get_tr("D"));
 		from_i =                    Vi[j-1][i] + DH.log2(hmm.get_node("I"+String.valueOf(j-1)).get_tr("D"));
 		from_d =                    Vd[j-1][i] + DH.log2(hmm.get_node("D"+String.valueOf(j-1)).get_tr("D"));
+		if (cs.state_type.equals("D")) {
+		    if (Math.abs(from_m-Vd[j][i]) < epsilon) {
+			cs=hmm.get_node("M"+String.valueOf(j-1)); j--;
+		    } 
+		    else if (Math.abs(from_i-Vd[j][i]) < epsilon) {
+			cs=hmm.get_node("I"+String.valueOf(j-1)); j--;
+		    } 
+		    else if (Math.abs(from_d-Vd[j][i]) < epsilon) {
+			cs=hmm.get_node("D"+String.valueOf(j-1)); j--;
 
-		if (Math.abs(from_m-Vd[j][i]) < epsilon) {
-		    possible_states.add("M"+String.valueOf(j-1));
-		    dec_j=true; 
-		    //cs=hmm.get_node("M"+String.valueOf(j-1));
-		    //j--;
-
-		} 
-		if (Math.abs(from_i-Vd[j][i]) < epsilon) {
-		    possible_states.add("I"+String.valueOf(j-1));
-		    dec_j=true; 
-		    //cs=hmm.get_node("I"+String.valueOf(j-1));
-		    //j--;
-
-		} 
-		if (Math.abs(from_d-Vd[j][i]) < epsilon) {
-		    possible_states.add("D"+String.valueOf(j-1));
-		    dec_j=true; 
-		    //cs=hmm.get_node("D"+String.valueOf(j-1));
-		    //j--;
-
-		    /*
-		      } else {
-		      dump();
-		      System.out.println(String.format("D: Vd[%d][%d]=%g, from_m = %g, from_i=%g, from_d=%g", j, i, Vd[j][i], from_m, from_i, from_d));
-		      new Die(String.format("Can't determine backtrace from %s, D", cs.state));
-		    */
+		    } else {
+			dump();
+			System.out.println(String.format("D: Vd[%d][%d]=%g, from_m = %g, from_i=%g, from_d=%g", 
+							 j, i, Vd[j][i], from_m, from_i, from_d));
+			new Die(String.format("Can't determine backtrace from %s, D", cs.state));
+		    }
 		}
 
-		//} else {		// Very unlikely that state_type none of "M", "I", or "D" (unless it's "begin" :)
-		//		new Die(String.format("Can't determine backtrace from %s", cs.state));
-	    }
+		String s=hmm.alignment.is_match_col(j)? "-":"";
+		buf.append(s);
 
-	    Iterator it=possible_states.iterator();
-	    while (it.hasNext()) {
-		System.out.println(String.format("possible state: %s", it.next()));
+	    } else {
+		new Die(String.format("unknown state_type??? %s", cs.state_type));
 	    }
-	    if (dec_i) i--;
-	    if (dec_j) j--;
-	    cs=hmm.get_node(possible_states.get(0));
-	    System.out.println(String.format("%c: next cs is %s", (cs.state_type.equals("D")? '-':path.charAt(i-1)), cs.state));
-
 	}
-	System.out.println(String.format("now what? i=%d, j=%d", i, j));
+	
+	//System.out.println(String.format("now what? i=%d, j=%d", i, j));
 	while (i>0) {
 	    cs=hmm.get_node("I"+String.valueOf(i-1));
-	    System.out.println(String.format("%c: next cs is %s (countdown)", path.charAt(i-1), cs.state));
+	    //System.out.println(String.format("%c: next cs is %s (countdown)", path.charAt(i-1), cs.state));
 	    buf.append(path.charAt(i-1));
 	    i--;
 	}
 	
-	return new String(buf.reverse());
 
+	return new String(buf.reverse());
     }
 
 ////////////////////////////////////////////////////////////////////////
