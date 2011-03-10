@@ -108,14 +108,14 @@ class ProfileHMM {
 	while ((prot=ps.next())!=null) {
 	    Viterbi viterbi=new Viterbi(this, prot, bps);
 	    double score=viterbi.score();
-	    viterbi.dump();
+	    //viterbi.dump();
 	    
 	    results.add(new ViterbiResult(ps.last_prot_name, prot, score));
 	    // System.out.println(String.format("%s: %g", ps.last_prot_name, score));
 	    
 	    if (score>0) { viterbi.backtrace(); }
 
-	    break;
+	    //break;
 	}
 	return results;
     }
@@ -168,6 +168,7 @@ class ProfileHMM {
 
 	Alignment a=new Alignment(align_file,8).read();
 	System.out.println(String.format("using alignment %s from %s", a, align_file));
+	System.out.println(a.dump());
 
 	BackgroundProbs bps=get_bgprobs(bps_file);
 	System.out.println("Using background probs in "+bps_file);
