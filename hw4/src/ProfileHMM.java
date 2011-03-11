@@ -79,17 +79,20 @@ class ProfileHMM {
 	    
 		// increment Ajk's and Eb(j)'s
 		cs.inc_tr(ns);
+		cs=get_node(cs.nextState(ns));
 		if (aa != '-') cs.inc_em(aa);
 
 		//System.out.println(String.format("a[%2d][%2d]=%c (%s)   %s ->%s", 
 		//r, c, aa, (align.is_match_col(c)? '*':' '), cs, cs.nextState(ns)));
-		cs=get_node(cs.nextState(ns));
+		//cs=get_node(cs.nextState(ns));
 	    }
 	    cs.inc_tr("end");
 
 	    //System.out.println(String.format("last state: %s",  cs));
 	    //System.out.println(String.format("end state: %s\n",  get_node("end")));
 	}
+
+	// this.dump_nonzero_counts();
 
 	// Normalize values (sort for purposes of debugging):
 	SortedSet<String> sortedKeys=new TreeSet<String>(graph.keySet());
@@ -127,7 +130,7 @@ class ProfileHMM {
 		bt_alignment.add(alignment);
 	    }
 
-	    break;
+	    //break;
 	}
 
 	Iterator it=bt_alignment.iterator();
@@ -144,6 +147,10 @@ class ProfileHMM {
 	    String prot=a.rowAsString(i).replaceAll("[-]", "");
 	    Viterbi viterbi=new Viterbi(this, prot, bps);
 	    double score=viterbi.score();
+	    if (score > 0) {
+		String alignment=viterbi.backtrace(); 
+		System.out.println("alignment is "+alignment);
+	    }
 	    results.add(new ViterbiResult(a.names[i], prot, score));
 	    // System.out.println(String.format("%s: %g", a.names[i], v));
 	}
@@ -161,6 +168,27 @@ class ProfileHMM {
 	}
 	return bps;
     }
+
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+    public void dump_nonzero_counts() {
+	SortedSet<String> sortedKeys=new TreeSet<String>(graph.keySet());
+	Iterator it=sortedKeys.iterator();
+	StringBuffer buf=new StringBuffer();
+
+	while (it.hasNext()) {
+	    ProfileHMM_Node s=get_node((String)it.next());
+	    String line=s.nonzero_counts();
+	    if (line.length() > 0) {
+		buf.append(String.format("%s: %s\n", s.state, line));
+	    }
+	}
+	System.out.println(buf.toString());
+    }
+
 
 ////////////////////////////////////////////////////////////////////////
 
