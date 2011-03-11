@@ -29,6 +29,7 @@ class ProfileHMM {
 	}
 	this.length=a.n_match_cols;
 	this.bps=bps;
+	this.alignment=a;
     }
 
     public void new_node(String state, boolean last) {
@@ -54,6 +55,11 @@ class ProfileHMM {
 	return 0;
     }
 
+
+    // Currently it looks as if the counts are associated with the state that the
+    // HMM is *leaving*.  In particular, the first letter of the seq gets associated
+    // with the begin state.  I'm not sure that's what I want...
+    // Also, it means that no counts will be associated with the end state...
     public void train(Alignment align, BackgroundProbs bps) {
 	this.initialize(align, bps);
 	System.out.println("training on alignment...");
@@ -63,7 +69,7 @@ class ProfileHMM {
 	    for (int c=0; c<path.length; c++) {
 		char aa=path[c];
 		
-		String ns="";
+		String ns="";	// ns=next state
 		if (aa != '-') {
 		    ns=align.is_match_col(c)? "M":"I";
 		} else {	// aa=='-'
@@ -73,17 +79,20 @@ class ProfileHMM {
 	    
 		// increment Ajk's and Eb(j)'s
 		cs.inc_tr(ns);
+		cs=get_node(cs.nextState(ns));
 		if (aa != '-') cs.inc_em(aa);
 
 		//System.out.println(String.format("a[%2d][%2d]=%c (%s)   %s ->%s", 
 		//r, c, aa, (align.is_match_col(c)? '*':' '), cs, cs.nextState(ns)));
-		cs=get_node(cs.nextState(ns));
+		//cs=get_node(cs.nextState(ns));
 	    }
 	    cs.inc_tr("end");
 
 	    //System.out.println(String.format("last state: %s",  cs));
 	    //System.out.println(String.format("end state: %s\n",  get_node("end")));
 	}
+
+	// this.dump_nonzero_counts();
 
 	// Normalize values (sort for purposes of debugging):
 	SortedSet<String> sortedKeys=new TreeSet<String>(graph.keySet());
@@ -105,18 +114,13 @@ class ProfileHMM {
 	ProtStream ps=new ProtStream(prot_file);
 	ArrayList<ViterbiResult> results=new ArrayList<ViterbiResult>();
 	String prot;
-	while ((prot=ps.next())!=null) {
-	    Viterbi viterbi=new Viterbi(this, prot, bps);
-	    double score=viterbi.score();
-	    //viterbi.dump();
-	    
-	    results.add(new ViterbiResult(ps.last_prot_name, prot, score));
-	    // System.out.println(String.format("%s: %g", ps.last_prot_name, score));
-	    
-	    if (score>0) { viterbi.backtrace(); }
 
-	    //break;
+	while ((prot=ps.next())!=null) {
+	    Viterbi viterbi=new Viterbi(this, prot, ps.last_prot_name, bps);
+	    ViterbiResult vr=viterbi.score();
+	    results.add(vr);
 	}
+
 	return results;
     }
 
@@ -124,10 +128,9 @@ class ProfileHMM {
 	ArrayList<ViterbiResult> results=new ArrayList<ViterbiResult>();
 	for (int i=0; i<a.n_rows; i++) {
 	    String prot=a.rowAsString(i).replaceAll("[-]", "");
-	    Viterbi viterbi=new Viterbi(this, prot, bps);
-	    double score=viterbi.score();
-	    results.add(new ViterbiResult(a.names[i], prot, score));
-	    // System.out.println(String.format("%s: %g", a.names[i], v));
+	    Viterbi viterbi=new Viterbi(this, prot, a.names[i], bps);
+	    ViterbiResult vr=viterbi.score();
+	    results.add(vr);
 	}
 	return results;
     }
@@ -143,6 +146,27 @@ class ProfileHMM {
 	}
 	return bps;
     }
+
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+    public void dump_nonzero_counts() {
+	SortedSet<String> sortedKeys=new TreeSet<String>(graph.keySet());
+	Iterator it=sortedKeys.iterator();
+	StringBuffer buf=new StringBuffer();
+
+	while (it.hasNext()) {
+	    ProfileHMM_Node s=get_node((String)it.next());
+	    String line=s.nonzero_counts();
+	    if (line.length() > 0) {
+		buf.append(String.format("%s: %s\n", s.state, line));
+	    }
+	}
+	System.out.println(buf.toString());
+    }
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -185,8 +209,11 @@ class ProfileHMM {
 	System.out.println("Sorted results:");
 	ViterbiResult[] sorted=results.toArray(new ViterbiResult[results.size()]);
 	Arrays.sort(sorted);
-	for (int i=0; i<sorted.length; i++) {
-	    System.out.println(String.format("%s %s", sorted[i].header(), (debugging? sorted[i].seq : "")));
+	//int top_n=2;
+	int top_n=sorted.length;
+	for (int i=0; i<top_n; i++) {
+	    ViterbiResult vr=sorted[i];
+	    System.out.println(vr.dump());
 	}
     }
 }

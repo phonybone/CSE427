@@ -181,6 +181,18 @@ class ProfileHMM_Node {
 
 ////////////////////////////////////////////////////////////////////////
 
+    public String nonzero_counts() {
+	StringBuffer buf=new StringBuffer();
+	for (char aa='A'; aa<'Z'; aa++) {
+	    if (Eb[aa-'A']>0) {
+		buf.append(String.format("%c: %3.1f ", aa, Eb[aa-'A']));
+	    }
+	}
+	return new String(buf);
+    }
+
+////////////////////////////////////////////////////////////////////////
+
     public static void main(String[] argv) {
 	ProfileHMM_Node n=new ProfileHMM_Node("M13", false);
 	n.inc_tr("M");
