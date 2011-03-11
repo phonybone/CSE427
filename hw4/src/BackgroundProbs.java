@@ -51,32 +51,31 @@ class BackgroundProbs implements Serializable {
     }
 
     public static void main(String[] argv) {
-	String prot_file="NC_011660.faa";
-	try {
-	    prot_file=argv[0];
-	} catch (ArrayIndexOutOfBoundsException e) {
-	    // pass
-	}
-	ProtStream ps=new ProtStream(prot_file);
-	System.out.println("using "+prot_file);
+	String prot_files[]={"NC_011660.faa", "NC_007618.faa", "NC_007624.faa"};
 
-	BackgroundProbs bps=new BackgroundProbs(ps);
+	for (int i=0; i<prot_files.length; i++) {
+	    String prot_file=prot_files[i];
+	    ProtStream ps=new ProtStream(prot_file);
+	    System.out.println("counting "+prot_file);
+
+	    BackgroundProbs bps=new BackgroundProbs(ps);
 	
-	double d=0;
-	for (char aa='A'; aa<='Z'; aa++) {
-	    System.out.println(String.format("%c: %6.4f", aa, bps.pr(aa)));
-	    d+=bps.pr(aa);
-	}
-	assert(d==1.0);
-	System.out.println(String.format("d=%6.4f",d));
+	    double d=0;
+	    for (char aa='A'; aa<='Z'; aa++) {
+		System.out.println(String.format("%c: %6.4f", aa, bps.pr(aa)));
+		d+=bps.pr(aa);
+	    }
+	    assert(d==1.0);
+	    System.out.println(String.format("d=%6.4f",d));
 
-	String output_file=prot_file;
-	output_file=output_file.replaceAll(".faa", ".bps.ser");
-	System.out.println("output_file is "+output_file);
-	try {
-	    bps.writeBps(output_file);
-	} catch (IOException ioe) {
-	    new Die(ioe);
+	    String output_file=prot_file;
+	    output_file=output_file.replaceAll(".faa", ".bps.ser");
+	    System.out.println("output_file is "+output_file);
+	    try {
+		bps.writeBps(output_file);
+	    } catch (IOException ioe) {
+		new Die(ioe);
+	    }
 	}
     }
 }

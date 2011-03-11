@@ -114,30 +114,13 @@ class ProfileHMM {
 	ProtStream ps=new ProtStream(prot_file);
 	ArrayList<ViterbiResult> results=new ArrayList<ViterbiResult>();
 	String prot;
-	ArrayList<String>bt_alignment=new ArrayList<String>();
 
 	while ((prot=ps.next())!=null) {
-	    Viterbi viterbi=new Viterbi(this, prot, bps);
-	    double score=viterbi.score();
-	    //viterbi.dump();
-	    
-	    results.add(new ViterbiResult(ps.last_prot_name, prot, score));
-	    // System.out.println(String.format("%s: %g", ps.last_prot_name, score));
-	    
-	    if (score>0) { 
-		String alignment=viterbi.backtrace(); 
-		System.out.println("alignment is "+alignment);
-		bt_alignment.add(alignment);
-	    }
-
-	    //break;
+	    Viterbi viterbi=new Viterbi(this, prot, ps.last_prot_name, bps);
+	    ViterbiResult vr=viterbi.score();
+	    results.add(vr);
 	}
 
-	Iterator it=bt_alignment.iterator();
-	System.out.println("bt alignment:");
-	while (it.hasNext()) {
-	    System.out.println(it.next());
-	}
 	return results;
     }
 
@@ -145,14 +128,9 @@ class ProfileHMM {
 	ArrayList<ViterbiResult> results=new ArrayList<ViterbiResult>();
 	for (int i=0; i<a.n_rows; i++) {
 	    String prot=a.rowAsString(i).replaceAll("[-]", "");
-	    Viterbi viterbi=new Viterbi(this, prot, bps);
-	    double score=viterbi.score();
-	    if (score > 0) {
-		String alignment=viterbi.backtrace(); 
-		System.out.println("alignment is "+alignment);
-	    }
-	    results.add(new ViterbiResult(a.names[i], prot, score));
-	    // System.out.println(String.format("%s: %g", a.names[i], v));
+	    Viterbi viterbi=new Viterbi(this, prot, a.names[i], bps);
+	    ViterbiResult vr=viterbi.score();
+	    results.add(vr);
 	}
 	return results;
     }
@@ -231,8 +209,11 @@ class ProfileHMM {
 	System.out.println("Sorted results:");
 	ViterbiResult[] sorted=results.toArray(new ViterbiResult[results.size()]);
 	Arrays.sort(sorted);
-	for (int i=0; i<sorted.length; i++) {
-	    System.out.println(String.format("%s %s", sorted[i].header(), (debugging? sorted[i].seq : "")));
+	//int top_n=2;
+	int top_n=sorted.length;
+	for (int i=0; i<top_n; i++) {
+	    ViterbiResult vr=sorted[i];
+	    System.out.println(vr.dump());
 	}
     }
 }

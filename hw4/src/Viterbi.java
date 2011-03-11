@@ -3,8 +3,10 @@ import java.util.*;
 
 class Viterbi {
     public ProfileHMM hmm;
-    public String path;
+    public String prot;
+    public String name;		// protein name
     public double score;
+    public String path;
     
     protected double[][] Vm;
     protected double[][] Vi;
@@ -14,27 +16,39 @@ class Viterbi {
     public BackgroundProbs bps;
 
 
-    Viterbi(ProfileHMM hmm, String path, BackgroundProbs bps) {
+    Viterbi(ProfileHMM hmm, String prot, String name, BackgroundProbs bps) {
 	this.hmm=hmm;
-	this.path=path;
+	this.prot=prot;
 
-	//System.out.println("path is "+path);
-	//System.out.println(String.format("allocating %d X %d", hmm.length+1, path.length()+1));
-	this.Vm=new double[hmm.length+1][path.length()+1];
-	this.Vi=new double[hmm.length+1][path.length()+1];
-	this.Vd=new double[hmm.length+1][path.length()+1];
-	this.Vend=new double[path.length()+2];
-	this.Vbegin=new double[path.length()+1];;
+	//System.out.println("prot is "+prot);
+	//System.out.println(String.format("allocating %d X %d", hmm.length+1, prot.length()+1));
+	this.Vm=new double[hmm.length+1][prot.length()+1];
+	this.Vi=new double[hmm.length+1][prot.length()+1];
+	this.Vd=new double[hmm.length+1][prot.length()+1];
+	this.Vend=new double[prot.length()+2];
+	this.Vbegin=new double[prot.length()+1];;
 	
 	this.bps=bps;
+	this.name=name;
     }
 
-    public double score() {
+    // Run the scoring algorithm.  If score>0, backtrace the path and 
+    // create an alignment.
+    // Returns a ViterbiResult object.
+    public ViterbiResult score() {
 	establish_basis();
 	special_recurrences();
 	basic_recurrence();
 	score=final_recurrence();
-	return score;
+	String alignment=null;
+
+	if (score>0) {
+	    ArrayList<ProfileHMM_Node> state_path=backtrace();
+	    path=state_path_to_string(state_path);
+	    alignment=align(state_path);
+	}
+	
+	return new ViterbiResult(name, prot, score, path, alignment);
     }
 
     // Establish basis:
@@ -50,13 +64,13 @@ class Viterbi {
 	}
 
 	// For states that don't exist, but have a place in the arrays due to 1-based indexing, set their values to NaN:
-	for (int i=0; i<path.length()+1; i++) {
+	for (int i=0; i<prot.length()+1; i++) {
 	    Vm[0][i]=Double.NaN;
 	    Vd[0][i]=Double.NaN;
 	}
 
 	// begin and end states:
-	for (int i=0; i<=path.length(); i++) {
+	for (int i=0; i<=prot.length(); i++) {
 	    Vbegin[i]=Double.NEGATIVE_INFINITY;	// Vbegin gets set to 0, below
 	    Vend[i]=Double.NEGATIVE_INFINITY;  // these will get overwritten, later
 	}
@@ -70,8 +84,8 @@ class Viterbi {
     // Special recurrences that depend on start state: M1, I0, D1
     // Also, I1, even though it doesn't depend on begin, so that the loop in basic_recurrence can start at 2
     public void special_recurrences() {
-	for (int i=1; i<=path.length(); i++) { 
-	    char Xi=path.charAt(i-1); // strings are still 0-based
+	for (int i=1; i<=prot.length(); i++) { 
+	    char Xi=prot.charAt(i-1); // strings are still 0-based
 	    Vm[1][i]=DH.log2( hmm.get_node("M1").get_em(Xi) / bps.pr(Xi)) + 
 		DH.max2( Vbegin[0] + DH.log2(hmm.get_node("begin").get_tr("M1")),
 			 Vi[0][i] +  DH.log2(hmm.get_node("I0").get_tr("M1"))); 
@@ -100,8 +114,8 @@ class Viterbi {
 
     // Basic recurrence:
     public void basic_recurrence() {
-	for (int i=1; i<=path.length(); i++) { // fixme: check indexing for i, given 1-based; 
-	    char Xi=path.charAt(i-1); // strings are still 0-based
+	for (int i=1; i<=prot.length(); i++) { // fixme: check indexing for i, given 1-based; 
+	    char Xi=prot.charAt(i-1); // strings are still 0-based
 	    double qXi=bps.pr(Xi);
 	    //System.out.println(String.format("\n%c: qXi=%g", Xi, qXi));
 
@@ -145,22 +159,22 @@ class Viterbi {
 	// I don't think it makes sense to build Vend for all of 0<=i<=L+1, only L+1.  But do it anyway...
 	Vend[0]=Double.NaN;
 	int L=hmm.length;
-	for (int i=1; i<=path.length()+1; i++) {
+	for (int i=1; i<=prot.length()+1; i++) {
 	    Vend[i]=DH.max3(Vm[L][i-1] + DH.log2(hmm.get_node("M"+String.valueOf(L)).get_tr("end")),
 			    Vi[L][i-1] + DH.log2(hmm.get_node("I"+String.valueOf(L)).get_tr("end")),
 			    Vd[L][i-1] + DH.log2(hmm.get_node("D"+String.valueOf(L)).get_tr("end")));
 	}
 
-	return Vend[path.length()+1];	
+	return Vend[prot.length()+1];	
     }
 
 ////////////////////////////////////////////////////////////////////////
 
-    public String backtrace() {
+    public ArrayList<ProfileHMM_Node> backtrace() {
 	ProfileHMM_Node cs=hmm.get_node("end");
 	int j=hmm.length;
-	int i=path.length()+1;
-	System.out.println(String.format("\npath is %s (%d)", path, path.length()));
+	int i=prot.length()+1;
+	//System.out.println(String.format("\nprot is %s (%d)", prot, prot.length()));
 	double epsilon=1E-4;
 
 	ArrayList<ProfileHMM_Node> state_path_rev=new ArrayList<ProfileHMM_Node>();
@@ -184,10 +198,10 @@ class Viterbi {
 	//System.out.println(String.format("from Vend, cs is %s", cs.state));
 	state_path_rev.add(cs);
 
-	i=path.length();
+	i=prot.length();
 	while (j >= 2) {
 	    //System.out.println(String.format("\nj=%d, i=%d, cs is %s", j, i, cs.state));
-	    char Xi=path.charAt(i-1); // strings are still 0-based
+	    char Xi=prot.charAt(i-1); // strings are still 0-based
 	    double qXi=bps.pr(Xi);
 	    double eMj=hmm.get_node("M"+String.valueOf(j)).get_em(Xi);
 	    double eIj=hmm.get_node("I"+String.valueOf(j)).get_em(Xi);
@@ -260,7 +274,7 @@ class Viterbi {
 	    } else {
 		new Die(String.format("unknown state_type??? %s", cs.state_type));
 	    }
-	    //System.out.println(String.format("%c: next cs is %s", path.charAt(i-1), cs.state));
+	    //System.out.println(String.format("%c: next cs is %s", prot.charAt(i-1), cs.state));
 	    state_path_rev.add(cs);
 
 	}
@@ -277,7 +291,7 @@ class Viterbi {
 	while (i>1) {
 	    cs=hmm.get_node("I0");
 	    state_path_rev.add(cs);
-	    System.out.println(String.format("%c: next cs is %s (countdown)", path.charAt(i-1), cs.state));
+	    System.out.println(String.format("%c: next cs is %s (countdown)", prot.charAt(i-1), cs.state));
 
 	    i--;
 	}
@@ -288,15 +302,29 @@ class Viterbi {
 	    state_path.add(state_path_rev.get(i));
 	}
 	
+	return state_path;
+    }
 
-	
+
+    public String state_path_to_string(ArrayList<ProfileHMM_Node> state_path) {
+	StringBuffer buf=new StringBuffer();
+	Iterator it=state_path.iterator();
+	while (it.hasNext()) {
+	    ProfileHMM_Node state=(ProfileHMM_Node)it.next();
+	    buf.append(state.state); // er...
+	    buf.append(' ');
+	}
+	return new String(buf);
+    }
+
+    public String align(ArrayList<ProfileHMM_Node> state_path) {
 	// Reconstruct the alignment
 	StringBuffer alignment=new StringBuffer();
-	i=0;
-	for (j=0; j<state_path.size(); j++) {
+	int i=0;
+	for (int j=0; j<state_path.size(); j++) {
 	    ProfileHMM_Node state=state_path.get(j);
 	    if (state.state_type.equals("M") || state.state_type.equals("I")) {
-		alignment.append(path.charAt(i++));
+		alignment.append(prot.charAt(i++));
 	    } else if (state.state_type.equals("D")) {
 		alignment.append('-');
 	    }
