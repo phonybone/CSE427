@@ -32,6 +32,7 @@ class Viterbi {
 	special_recurrences();
 	basic_recurrence();
 	score=final_recurrence();
+	dump();
 	return score;
     }
 
@@ -56,7 +57,7 @@ class Viterbi {
 	// begin and end states:
 	for (int i=0; i<=path.length(); i++) {
 	    Vbegin[i]=Double.NEGATIVE_INFINITY;	// Vbegin gets set to 0, below
-	    Vend[i]=Double.NEGATIVE_INFINITY; // these will get overwritten, later
+	    Vend[i]=Double.NEGATIVE_INFINITY;  // these will get overwritten, later
 	}
 	Vbegin[0]=0;
 	// System.out.println(String.format("%s:\n%s\n", "Vbegin", d1s(Vbegin, "Vbegin")));
@@ -72,19 +73,19 @@ class Viterbi {
 	    char Xi=path.charAt(i-1); // strings are still 0-based
 	    Vm[1][i]=DH.log2( hmm.get_node("M1").get_em(Xi) / bps.pr(Xi)) + 
 		DH.max2( Vbegin[0] + DH.log2(hmm.get_node("begin").get_tr("M1")),
-		      Vi[0][i] +  DH.log2(hmm.get_node("I0").get_tr("M1"))); 
+			 Vi[0][i] +  DH.log2(hmm.get_node("I0").get_tr("M1"))); 
 	    
 	    Vi[0][i]=DH.log2(hmm.get_node("I0").get_em(Xi) / bps.pr(Xi)) + 
 		DH.max2(Vbegin[i-1] + DH.log2(hmm.get_node("begin").get_tr("I")),
-		     Vi[0][i-1]  + DH.log2(hmm.get_node("I0").get_tr("I")));
+			Vi[0][i-1]  + DH.log2(hmm.get_node("I0").get_tr("I")));
 
 	    Vi[1][i]=DH.log2(hmm.get_node("I1").get_em(Xi) / bps.pr(Xi)) + 
 		DH.max3(Vm[1][i-1] + DH.log2(hmm.get_node("M1").get_tr("I")),
-		     Vi[1][i-1] + DH.log2(hmm.get_node("I0").get_tr("I")),
-		     Vd[1][i-1] + DH.log2(hmm.get_node("D1").get_tr("I")));
+			Vi[1][i-1] + DH.log2(hmm.get_node("I0").get_tr("I")),
+			Vd[1][i-1] + DH.log2(hmm.get_node("D1").get_tr("I")));
 
 	    Vd[1][i]=DH.max2(Vbegin[0] + hmm.get_node("begin").get_tr("D"),
-			  Vi[0][i] + hmm.get_node("I0").get_tr("D"));
+			     Vi[0][i] + hmm.get_node("I0").get_tr("D"));
 	}
 
 	/* 
@@ -105,10 +106,15 @@ class Viterbi {
 
 	    for (int j=2; j<=hmm.length; j++) {
 		double eMj=hmm.get_node("M"+String.valueOf(j)).get_em(Xi);
-		Vm[j][i]=DH.log2(eMj/qXi) + 
-		    DH.max3(Vm[j-1][i-1]+DH.log2(hmm.get_node("M"+String.valueOf(j-1)).get_tr("M")),
-			    Vi[j-1][i-1]+DH.log2(hmm.get_node("I"+String.valueOf(j-1)).get_tr("M")),
-			    Vd[j-1][i-1]+DH.log2(hmm.get_node("D"+String.valueOf(j-1)).get_tr("M")));
+		double part1=DH.log2(eMj/qXi);
+
+		double fm=Vm[j-1][i-1]+DH.log2(hmm.get_node("M"+String.valueOf(j-1)).get_tr("M"));
+		double fi=Vi[j-1][i-1]+DH.log2(hmm.get_node("I"+String.valueOf(j-1)).get_tr("M"));
+		double fd=Vd[j-1][i-1]+DH.log2(hmm.get_node("D"+String.valueOf(j-1)).get_tr("M"));
+
+		Vm[j][i]=part1+DH.max3(fm, fi, fd);
+		System.out.println(String.format("Vm[%d][%d]=%g; %g+max3(%g,%g,%g) eMj=%g, qXi=%g", 
+						 i, j, Vm[j][i], part1, fm, fi, fd, eMj, qXi));
 
 		//System.out.println(String.format("eM[%d](%c)=%g\tVm[%d][%d]=%g", j, Xi, eMj, j, i, Vm[j][i]));
 
@@ -153,9 +159,11 @@ class Viterbi {
 	ProfileHMM_Node cs=hmm.get_node("end");
 	int j=hmm.length;
 	int i=path.length()+1;
-	// System.out.println(String.format("path is %s (%d)", path, path.length()));
+	System.out.println(String.format("\npath is %s (%d)", path, path.length()));
 	double epsilon=1E-4;
-	StringBuffer buf=new StringBuffer();
+
+	ArrayList<ProfileHMM_Node> state_path=new ArrayList<ProfileHMM_Node>();
+	state_path.add(hmm.get_node("end"));
 
 	double from_m=Vm[j][i-1] + DH.log2(hmm.get_node("M"+String.valueOf(j)).get_tr("end"));
 	double from_i=Vi[j][i-1] + DH.log2(hmm.get_node("I"+String.valueOf(j)).get_tr("end"));
@@ -172,7 +180,8 @@ class Viterbi {
 	} else {
 	    new Die("Can't determine backtrace from end state???");
 	}
-	//System.out.println(String.format("from Vend, cs is %s", cs.state));
+	System.out.println(String.format("from Vend, cs is %s", cs.state));
+	state_path.add(cs);
 
 	i=path.length();
 	while (j >= 2) {
@@ -202,8 +211,6 @@ class Viterbi {
 							     j, i, Vm[j][i], from_m, from_i, from_d));
 		    new Die(String.format("Can't determine backtrace from %s, M", cs.state));
 		}
-		//buf.append(hmm.alignment.is_match_col(j)? Xi:"!");
-		buf.append(Xi);
 
 	    } else if (cs.state_type.equals("I")) {
 		from_m = DH.log2(eIj/qXi) + Vm[j][i-1] + DH.log2(hmm.get_node("M"+String.valueOf(j-1)).get_tr("I"));
@@ -225,8 +232,6 @@ class Viterbi {
 						     j, i, Vi[j][i], DH.log2(eIj/qXi), from_m, from_i, from_d));
 		    new Die(String.format("Can't determine backtrace from %s, I", cs.state));
 		}
-		//buf.append(hmm.alignment.is_match_col(j)? Xi:"?");
-		//buf.append(Xi);
 
 	    } else if (cs.state_type.equals("D")) {
 		from_m =                    Vm[j-1][i] + DH.log2(hmm.get_node("M"+String.valueOf(j-1)).get_tr("D"));
@@ -249,28 +254,43 @@ class Viterbi {
 			new Die(String.format("Can't determine backtrace from %s, D", cs.state));
 		    }
 		}
-		String s=hmm.alignment.is_match_col(j)? "-":"";
-		//buf.append(s);
-		buf.append(Xi);
-
 
 	    } else {
 		new Die(String.format("unknown state_type??? %s", cs.state_type));
 	    }
-	    System.out.println(String.format("%c: next cs is %s, buf is %s", path.charAt(i-1), cs.state, buf.toString()));
+	    System.out.println(String.format("%c: next cs is %s", path.charAt(i-1), cs.state));
+	    state_path.add(cs);
 
 	}
 	
-	//System.out.println(String.format("now what? i=%d, j=%d", i, j));
+	
+	System.out.println(String.format("now what? i=%d, j=%d", i, j));
+	// fixme!
+	// What you really want is to stay in I0...
+	// Except maybe what you really want to do is continue to probe, of the states possible, which you came from
+	// D1: possible states are I0 and begin
+	// I1: I1, D1, M1
+	// M1: I0, begin
+	// I0: I0, begin
 	while (i>0) {
-	    cs=hmm.get_node("I"+String.valueOf(i-1));
-	    System.out.println(String.format("%c: next cs is %s (countdown), buf is %s", path.charAt(i-1), cs.state, buf.toString()));
-	    buf.append(path.charAt(i-1));
+	    cs=hmm.get_node("I0");
+	    state_path.add(cs);
+	    System.out.println(String.format("%c: next cs is %s (countdown)", path.charAt(i-1), cs.state));
+
 	    i--;
 	}
-	
 
-	return new String(buf.reverse());
+	// Print out the path:
+	state_path.add(hmm.get_node("begin"));
+	StringBuffer state_path_buf=new StringBuffer();
+	for (i=state_path.size()-1; i>=0; i--) {
+	    state_path_buf.append(state_path.get(i).state);
+	    state_path_buf.append(" ");
+	}
+	System.out.println(new String(state_path_buf));
+	
+	
+	return "barf";
     }
 
 ////////////////////////////////////////////////////////////////////////

@@ -55,6 +55,11 @@ class ProfileHMM {
 	return 0;
     }
 
+
+    // Currently it looks as if the counts are associated with the state that the
+    // HMM is *leaving*.  In particular, the first letter of the seq gets associated
+    // with the begin state.  I'm not sure that's what I want...
+    // Also, it means that no counts will be associated with the end state...
     public void train(Alignment align, BackgroundProbs bps) {
 	this.initialize(align, bps);
 	System.out.println("training on alignment...");
@@ -64,7 +69,7 @@ class ProfileHMM {
 	    for (int c=0; c<path.length; c++) {
 		char aa=path[c];
 		
-		String ns="";
+		String ns="";	// ns=next state
 		if (aa != '-') {
 		    ns=align.is_match_col(c)? "M":"I";
 		} else {	// aa=='-'
@@ -122,7 +127,7 @@ class ProfileHMM {
 		bt_alignment.add(alignment);
 	    }
 
-	    //break;
+	    break;
 	}
 
 	Iterator it=bt_alignment.iterator();
